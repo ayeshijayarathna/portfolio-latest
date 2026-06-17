@@ -3,7 +3,7 @@ import { useTheme } from '../context/ThemeContext'
 import { BsSun, BsMoon } from 'react-icons/bs'
 import { RiMenuLine, RiCloseLine } from 'react-icons/ri'
 
-const navLinks = ['Home', 'About', 'Projects', 'Education', 'Experience', 'Skills', 'Certificates', 'Contact']
+const navLinks = ['Home', 'About', 'Education', 'Certificates', 'Experience', 'Projects', 'Skills']
 
 export default function Navbar() {
   const { isDark, toggleTheme } = useTheme()
@@ -20,6 +20,11 @@ export default function Navbar() {
     e.preventDefault()
     const section = document.getElementById(link.toLowerCase())
     if (section) section.scrollIntoView({ behavior: 'smooth' })
+    setMenuOpen(false)
+  }
+
+  const scrollToContact = () => {
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
     setMenuOpen(false)
   }
 
@@ -40,9 +45,7 @@ export default function Navbar() {
       alignItems: 'center',
       transition: 'all 0.3s ease',
       borderBottom: scrolled
-        ? isDark
-          ? '1px solid rgba(212,164,154,0.15)'
-          : '1px solid rgba(212,164,154,0.3)'
+        ? isDark ? '1px solid rgba(212,164,154,0.15)' : '1px solid rgba(212,164,154,0.3)'
         : 'none'
     }}>
 
@@ -52,17 +55,18 @@ export default function Navbar() {
         fontSize: '1.8rem',
         color: '#d4a49a',
         cursor: 'pointer'
-      }}>
+      }} onClick={() => document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' })}>
         Ayeshi
       </span>
 
       {/* Desktop Nav */}
       <ul className="desktop-nav" style={{
         display: 'flex',
-        gap: '32px',
+        gap: '28px',
         listStyle: 'none',
         margin: 0,
-        padding: 0
+        padding: 0,
+        alignItems: 'center',
       }}>
         {navLinks.map(link => (
           <li key={link}>
@@ -73,8 +77,8 @@ export default function Navbar() {
               onMouseLeave={e => e.target.style.color = isDark ? '#e8e0d5' : '#2c2c2c'}
               style={{
                 fontFamily: 'var(--font-sans)',
-                fontSize: '0.7rem',
-                fontWeight: '500',
+                fontSize: '0.65rem',
+                fontWeight: 500,
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 color: isDark ? '#e8e0d5' : '#2c2c2c',
@@ -86,9 +90,39 @@ export default function Navbar() {
             </a>
           </li>
         ))}
+
+        {/* Contact Button */}
+        <li>
+          <button
+            onClick={scrollToContact}
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.65rem',
+              fontWeight: 500,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              padding: '8px 20px',
+              border: '1px solid #b47c7c',
+              backgroundColor: 'transparent',
+              color: '#b47c7c',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.backgroundColor = '#b47c7c'
+              e.currentTarget.style.color = '#fff'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+              e.currentTarget.style.color = '#b47c7c'
+            }}
+          >
+            Contact
+          </button>
+        </li>
       </ul>
 
-      {/* Right side: theme toggle + mobile menu */}
+      {/* Right side */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <button
           onClick={toggleTheme}
@@ -153,6 +187,23 @@ export default function Navbar() {
               {link}
             </a>
           ))}
+          <button
+            onClick={scrollToContact}
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '0.75rem',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              padding: '10px 20px',
+              border: '1px solid #b47c7c',
+              backgroundColor: 'transparent',
+              color: '#b47c7c',
+              cursor: 'pointer',
+              alignSelf: 'flex-start',
+            }}
+          >
+            Contact
+          </button>
         </div>
       )}
     </nav>
