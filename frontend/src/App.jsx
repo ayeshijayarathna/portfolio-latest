@@ -1,6 +1,8 @@
 import Navbar from './components/Navbar'
 import Home from './sections/Home'
 import About from './sections/About'
+import Education from './sections/Education'
+import Certificates from './sections/Certificates'
 import Projects from './sections/Projects'
 
 const Section = ({ id, label }) => (
@@ -15,8 +17,8 @@ function App() {
       <Navbar />
       <Home />
       <About />
-      <Section id="education" label="Education" />
-      <Section id="certificates" label="Certificates" />
+      <Education />
+      <Certificates />
       <Section id="experience" label="Experience" />
       <Projects />
       <Section id="skills" label="Skills" />
