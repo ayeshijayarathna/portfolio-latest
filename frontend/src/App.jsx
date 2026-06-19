@@ -5,6 +5,7 @@ import Education from './sections/Education'
 import Certificates from './sections/Certificates'
 import Experience from './sections/Experience'
 import Projects from './sections/Projects'
+import Skills from './sections/Skills'
 
 const Section = ({ id, label }) => (
   <section id={id} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -22,7 +23,7 @@ function App() {
       <Certificates />
       <Experience />
       <Projects />
-      <Section id="skills" label="Skills" />
+      <Skills />
       <Section id="contact" label="Contact" />
     </main>
   )
