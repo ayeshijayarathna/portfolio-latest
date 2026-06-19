@@ -6,12 +6,7 @@ import Certificates from './sections/Certificates'
 import Experience from './sections/Experience'
 import Projects from './sections/Projects'
 import Skills from './sections/Skills'
-
-const Section = ({ id, label }) => (
-  <section id={id} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-    <p style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', opacity: 0.2 }}>{label}</p>
-  </section>
-)
+import Contact from './sections/Contact'
 
 function App() {
   return (
@@ -24,7 +19,7 @@ function App() {
       <Experience />
       <Projects />
       <Skills />
-      <Section id="contact" label="Contact" />
+      <Contact />
     </main>
   )
 }
