@@ -3,6 +3,7 @@ import Home from './sections/Home'
 import About from './sections/About'
 import Education from './sections/Education'
 import Certificates from './sections/Certificates'
+import Experience from './sections/Experience'
 import Projects from './sections/Projects'
 
 const Section = ({ id, label }) => (
@@ -19,7 +20,7 @@ function App() {
       <About />
       <Education />
       <Certificates />
-      <Section id="experience" label="Experience" />
+      <Experience />
       <Projects />
       <Section id="skills" label="Skills" />
       <Section id="contact" label="Contact" />
