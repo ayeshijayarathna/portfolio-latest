@@ -2,7 +2,10 @@ import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
+
 import contactRoute from './routes/contactRoute.js'
+import projectRoute from './routes/projectRoute.js'
+import authRoute from './routes/authRoute.js'
 
 dotenv.config()
 
@@ -15,12 +18,14 @@ app.use(cors({
 app.use(express.json())
 
 // Routes
+app.use('/api/auth', authRoute)
 app.use('/api/contact', contactRoute)
+app.use('/api/projects', projectRoute)
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 
-// DB + Server
+// MongoDB + Server start
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB connected')
