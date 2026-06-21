@@ -25,124 +25,126 @@ function useApi(endpoint) {
   return { get, post, put, putSingle, del }
 }
 
-// ---- SHARED STYLES ----
-const sectionTitle = { fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 400, color: '#e8e0d5' }
-const addBtn = { display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 18px', backgroundColor: '#b47c7c', border: 'none', color: '#fff', fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: '2px' }
-const saveBtn = { display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', backgroundColor: '#b47c7c', border: 'none', color: '#fff', fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 500, letterSpacing: '0.12em', cursor: 'pointer', borderRadius: '2px' }
-const cancelBtn = { display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', backgroundColor: 'transparent', border: '1px solid rgba(232,224,213,0.2)', color: 'rgba(232,224,213,0.6)', fontFamily: 'var(--font-sans)', fontSize: '0.68rem', cursor: 'pointer', borderRadius: '2px' }
-const iconBtn = { background: 'none', border: 'none', color: 'rgba(232,224,213,0.5)', cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center' }
-const formCard = { backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(232,224,213,0.1)', borderRadius: '4px', padding: '28px', marginBottom: '24px' }
-const formGrid2 = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }
-const formLabel = { fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(232,224,213,0.45)', display: 'block', marginBottom: '6px' }
-const formInput = { width: '100%', padding: '10px 14px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(232,224,213,0.12)', borderRadius: '3px', fontFamily: 'var(--font-sans)', fontSize: '0.85rem', color: '#e8e0d5', outline: 'none', boxSizing: 'border-box' }
-const itemCard = { display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 20px', backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(232,224,213,0.08)', borderRadius: '4px' }
-const itemTitle = { fontFamily: 'var(--font-sans)', fontSize: '0.88rem', fontWeight: 500, color: '#e8e0d5', marginBottom: '3px' }
-const itemMeta = { fontFamily: 'var(--font-sans)', fontSize: '0.72rem', color: 'rgba(232,224,213,0.45)', fontWeight: 300 }
+// Theme-aware styles
+function getStyles(isDark) {
+  const text = isDark ? '#e8e0d5' : '#1a1a1a'
+  const muted = isDark ? 'rgba(232,224,213,0.55)' : 'rgba(26,26,26,0.55)'
+  const cardBg = isDark ? 'rgba(255,255,255,0.03)' : '#ffffff'
+  const cardBorder = isDark ? 'rgba(232,224,213,0.1)' : 'rgba(26,26,26,0.12)'
+  const inputBg = isDark ? 'rgba(255,255,255,0.05)' : '#f8f5f0'
+  const inputBorder = isDark ? 'rgba(232,224,213,0.12)' : 'rgba(26,26,26,0.15)'
+  const labelColor = isDark ? 'rgba(232,224,213,0.45)' : 'rgba(26,26,26,0.5)'
+
+  return {
+    text, muted, cardBg, cardBorder, inputBg, inputBorder, labelColor,
+    sectionTitle: { fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 400, color: text },
+    addBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 18px', backgroundColor: '#b47c7c', border: 'none', color: '#fff', fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: '2px' },
+    saveBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', backgroundColor: '#b47c7c', border: 'none', color: '#fff', fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 500, letterSpacing: '0.12em', cursor: 'pointer', borderRadius: '2px' },
+    cancelBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 20px', backgroundColor: 'transparent', border: `1px solid ${cardBorder}`, color: muted, fontFamily: 'var(--font-sans)', fontSize: '0.68rem', cursor: 'pointer', borderRadius: '2px' },
+    iconBtn: { background: 'none', border: 'none', color: muted, cursor: 'pointer', padding: '6px', display: 'flex', alignItems: 'center' },
+    formCard: { backgroundColor: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '4px', padding: '28px', marginBottom: '24px' },
+    formGrid2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' },
+    formLabel: { fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: labelColor, display: 'block', marginBottom: '6px' },
+    formInput: { width: '100%', padding: '10px 14px', backgroundColor: inputBg, border: `1px solid ${inputBorder}`, borderRadius: '3px', fontFamily: 'var(--font-sans)', fontSize: '0.85rem', color: text, outline: 'none', boxSizing: 'border-box' },
+    itemCard: { display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 20px', backgroundColor: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '4px' },
+    itemTitle: { fontFamily: 'var(--font-sans)', fontSize: '0.88rem', fontWeight: 500, color: text, marginBottom: '3px' },
+    itemMeta: { fontFamily: 'var(--font-sans)', fontSize: '0.72rem', color: muted, fontWeight: 300 },
+  }
+}
 
 // ---- PROFILE TAB ----
-function ProfileTab() {
+function ProfileTab({ isDark }) {
   const api = useApi('profile')
   const [profile, setProfile] = useState(null)
   const [saved, setSaved] = useState(false)
+  const s = getStyles(isDark)
 
   useEffect(() => { api.get().then(setProfile) }, [])
 
   const handleChange = (key, value) => setProfile({ ...profile, [key]: value })
-
   const handleRolesChange = val => setProfile({ ...profile, roles: val.split(',').map(r => r.trim()).filter(Boolean) })
-
   const handleStatChange = (i, key, val) => {
     const stats = [...profile.stats]
     stats[i] = { ...stats[i], [key]: val }
     setProfile({ ...profile, stats })
   }
-
   const handleSave = async () => {
     await api.putSingle(profile)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
 
-  if (!profile) return <p style={{ color: 'rgba(232,224,213,0.4)', fontFamily: 'var(--font-sans)' }}>Loading...</p>
+  if (!profile) return <p style={{ color: s.muted, fontFamily: 'var(--font-sans)' }}>Loading...</p>
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-        <h2 style={sectionTitle}>Home & About</h2>
-        <button onClick={handleSave} style={saveBtn}>
+        <h2 style={s.sectionTitle}>Home & About</h2>
+        <button onClick={handleSave} style={s.saveBtn}>
           {saved ? <><FiCheck size={13} /> Saved!</> : <><FiCheck size={13} /> Save Changes</>}
         </button>
       </div>
 
-      {/* Home Section */}
-      <div style={{ ...formCard, marginBottom: '24px' }}>
-        <p style={{ ...formLabel, fontSize: '0.7rem', color: '#c9a882', marginBottom: '20px' }}>HOME SECTION</p>
-        <div style={formGrid2}>
+      <div style={s.formCard}>
+        <p style={{ ...s.formLabel, fontSize: '0.7rem', color: '#c9a882', marginBottom: '20px' }}>HOME SECTION</p>
+        <div style={s.formGrid2}>
           <div style={{ gridColumn: '1 / -1' }}>
-            <label style={formLabel}>Full Name</label>
-            <input value={profile.name} onChange={e => handleChange('name', e.target.value)} style={formInput} />
-          </div>
-          <div style={{ gridColumn: '1 / -1' }}>
-            <label style={formLabel}>Tagline / Description</label>
-            <textarea value={profile.tagline} onChange={e => handleChange('tagline', e.target.value)}
-              rows={3} style={{ ...formInput, resize: 'vertical' }} />
+            <label style={s.formLabel}>Full Name</label>
+            <input value={profile.name || ''} onChange={e => handleChange('name', e.target.value)} style={s.formInput} />
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
-            <label style={formLabel}>Roles (comma separated — typewriter)</label>
-            <input value={profile.roles?.join(', ')} onChange={e => handleRolesChange(e.target.value)} style={formInput} placeholder="Full Stack Engineer, UI/UX Designer..." />
-          </div>
-          <div>
-            <label style={formLabel}>Est. Year</label>
-            <input value={profile.estYear} onChange={e => handleChange('estYear', e.target.value)} style={formInput} />
-          </div>
-          <div>
-            <label style={formLabel}>Location</label>
-            <input value={profile.location} onChange={e => handleChange('location', e.target.value)} style={formInput} />
-          </div>
-          <div>
-            <label style={formLabel}>LinkedIn URL</label>
-            <input value={profile.linkedin} onChange={e => handleChange('linkedin', e.target.value)} style={formInput} />
-          </div>
-          <div>
-            <label style={formLabel}>GitHub URL</label>
-            <input value={profile.github} onChange={e => handleChange('github', e.target.value)} style={formInput} />
+            <label style={s.formLabel}>Tagline / Description</label>
+            <textarea value={profile.tagline || ''} onChange={e => handleChange('tagline', e.target.value)} rows={3} style={{ ...s.formInput, resize: 'vertical' }} />
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
-            <label style={formLabel}>Email</label>
-            <input value={profile.email} onChange={e => handleChange('email', e.target.value)} style={formInput} />
+            <label style={s.formLabel}>Roles (comma separated — typewriter)</label>
+            <input value={profile.roles?.join(', ') || ''} onChange={e => handleRolesChange(e.target.value)} style={s.formInput} placeholder="Full Stack Engineer, UI/UX Designer..." />
+          </div>
+          <div>
+            <label style={s.formLabel}>Est. Year</label>
+            <input value={profile.estYear || ''} onChange={e => handleChange('estYear', e.target.value)} style={s.formInput} />
+          </div>
+          <div>
+            <label style={s.formLabel}>Location</label>
+            <input value={profile.location || ''} onChange={e => handleChange('location', e.target.value)} style={s.formInput} />
+          </div>
+          <div>
+            <label style={s.formLabel}>LinkedIn URL</label>
+            <input value={profile.linkedin || ''} onChange={e => handleChange('linkedin', e.target.value)} style={s.formInput} />
+          </div>
+          <div>
+            <label style={s.formLabel}>GitHub URL</label>
+            <input value={profile.github || ''} onChange={e => handleChange('github', e.target.value)} style={s.formInput} />
+          </div>
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={s.formLabel}>Email</label>
+            <input value={profile.email || ''} onChange={e => handleChange('email', e.target.value)} style={s.formInput} />
           </div>
         </div>
       </div>
 
-      {/* About Section */}
-      <div style={formCard}>
-        <p style={{ ...formLabel, fontSize: '0.7rem', color: '#c9a882', marginBottom: '20px' }}>ABOUT SECTION</p>
+      <div style={s.formCard}>
+        <p style={{ ...s.formLabel, fontSize: '0.7rem', color: '#c9a882', marginBottom: '20px' }}>ABOUT SECTION</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
-            <label style={formLabel}>Heading</label>
-            <input value={profile.aboutHeading} onChange={e => handleChange('aboutHeading', e.target.value)} style={formInput} />
+            <label style={s.formLabel}>Heading</label>
+            <input value={profile.aboutHeading || ''} onChange={e => handleChange('aboutHeading', e.target.value)} style={s.formInput} />
           </div>
           <div>
-            <label style={formLabel}>Bio Paragraph 1</label>
-            <textarea value={profile.aboutBio1} onChange={e => handleChange('aboutBio1', e.target.value)}
-              rows={4} style={{ ...formInput, resize: 'vertical' }} />
+            <label style={s.formLabel}>Bio Paragraph 1</label>
+            <textarea value={profile.aboutBio1 || ''} onChange={e => handleChange('aboutBio1', e.target.value)} rows={4} style={{ ...s.formInput, resize: 'vertical' }} />
           </div>
           <div>
-            <label style={formLabel}>Bio Paragraph 2</label>
-            <textarea value={profile.aboutBio2} onChange={e => handleChange('aboutBio2', e.target.value)}
-              rows={4} style={{ ...formInput, resize: 'vertical' }} />
+            <label style={s.formLabel}>Bio Paragraph 2</label>
+            <textarea value={profile.aboutBio2 || ''} onChange={e => handleChange('aboutBio2', e.target.value)} rows={4} style={{ ...s.formInput, resize: 'vertical' }} />
           </div>
-
-          {/* Stats */}
           <div>
-            <label style={{ ...formLabel, marginBottom: '12px' }}>Stats</label>
+            <label style={{ ...s.formLabel, marginBottom: '12px' }}>Stats</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
               {profile.stats?.map((stat, i) => (
-                <div key={i} style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(232,224,213,0.1)', borderRadius: '4px', padding: '12px' }}>
-                  <input value={stat.value} onChange={e => handleStatChange(i, 'value', e.target.value)}
-                    placeholder="10+" style={{ ...formInput, marginBottom: '8px', fontSize: '0.8rem' }} />
-                  <input value={stat.label} onChange={e => handleStatChange(i, 'label', e.target.value)}
-                    placeholder="Projects" style={{ ...formInput, fontSize: '0.8rem' }} />
+                <div key={i} style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8f5f0', border: `1px solid ${s.cardBorder}`, borderRadius: '4px', padding: '12px' }}>
+                  <input value={stat.value || ''} onChange={e => handleStatChange(i, 'value', e.target.value)} placeholder="10+" style={{ ...s.formInput, marginBottom: '8px', fontSize: '0.8rem' }} />
+                  <input value={stat.label || ''} onChange={e => handleStatChange(i, 'label', e.target.value)} placeholder="Projects" style={{ ...s.formInput, fontSize: '0.8rem' }} />
                 </div>
               ))}
             </div>
@@ -154,67 +156,61 @@ function ProfileTab() {
 }
 
 // ---- PROJECTS TAB ----
-function ProjectsTab() {
+function ProjectsTab({ isDark }) {
   const api = useApi('projects')
   const [items, setItems] = useState([])
   const [form, setForm] = useState({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '' })
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
+  const s = getStyles(isDark)
 
-  useEffect(() => { api.get().then(setItems) }, [])
+  useEffect(() => { api.get().then(data => { if (Array.isArray(data)) setItems(data) }) }, [])
 
   const resetForm = () => { setForm({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '' }); setEditing(null); setShowForm(false) }
-
   const handleSave = async () => {
     const payload = { ...form, tech: form.tech.split(',').map(t => t.trim()).filter(Boolean) }
-    if (editing) {
-      const updated = await api.put(editing, payload)
-      setItems(items.map(i => i._id === editing ? updated : i))
-    } else {
-      const created = await api.post(payload)
-      setItems([...items, created])
-    }
+    if (editing) { const u = await api.put(editing, payload); setItems(items.map(i => i._id === editing ? u : i)) }
+    else { const c = await api.post(payload); setItems([...items, c]) }
     resetForm()
   }
-
-  const handleEdit = item => { setForm({ ...item, tech: item.tech?.join(', ') }); setEditing(item._id); setShowForm(true) }
+  const handleEdit = item => { setForm({ ...item, tech: item.tech?.join(', ') || '' }); setEditing(item._id); setShowForm(true) }
   const handleDelete = async id => { if (!confirm('Delete?')) return; await api.del(id); setItems(items.filter(i => i._id !== id)) }
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 style={sectionTitle}>Projects ({items.length})</h2>
-        <button onClick={() => { setShowForm(!showForm); setEditing(null) }} style={addBtn}><FiPlus size={14} /> Add</button>
+        <h2 style={s.sectionTitle}>Projects ({items.length})</h2>
+        <button onClick={() => { setShowForm(!showForm); setEditing(null) }} style={s.addBtn}><FiPlus size={14} /> Add</button>
       </div>
       {showForm && (
-        <div style={formCard}>
-          <div style={formGrid2}>
-            {[['title','Title','Project title'],['category','Category','Fullstack / UI/UX'],['tech','Tech (comma separated)','React, Node.js...'],['github','GitHub URL','https://...'],['live','Live URL','https://...'],['year','Year','2024']].map(([key,label,placeholder]) => (
+        <div style={s.formCard}>
+          <div style={s.formGrid2}>
+            {[['title','Title','Project title'],['category','Category','Fullstack / UI/UX'],['tech','Tech (comma separated)','React, Node.js...'],['github','GitHub URL','https://...'],['live','Live URL','https://...'],['year','Year','2024']].map(([key,label,ph]) => (
               <div key={key}>
-                <label style={formLabel}>{label}</label>
-                <input value={form[key]} onChange={e => setForm({...form,[key]:e.target.value})} placeholder={placeholder} style={formInput} />
+                <label style={s.formLabel}>{label}</label>
+                <input value={form[key] || ''} onChange={e => setForm({...form,[key]:e.target.value})} placeholder={ph} style={s.formInput} />
               </div>
             ))}
             <div style={{ gridColumn: '1 / -1' }}>
-              <label style={formLabel}>Description</label>
-              <textarea value={form.description} onChange={e => setForm({...form,description:e.target.value})} rows={3} style={{...formInput,resize:'vertical'}} />
+              <label style={s.formLabel}>Description</label>
+              <textarea value={form.description || ''} onChange={e => setForm({...form,description:e.target.value})} rows={3} style={{...s.formInput,resize:'vertical'}} />
             </div>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button onClick={handleSave} style={saveBtn}><FiCheck size={13} /> {editing ? 'Update' : 'Save'}</button>
-            <button onClick={resetForm} style={cancelBtn}><FiX size={13} /> Cancel</button>
+            <button onClick={handleSave} style={s.saveBtn}><FiCheck size={13} /> {editing ? 'Update' : 'Save'}</button>
+            <button onClick={resetForm} style={s.cancelBtn}><FiX size={13} /> Cancel</button>
           </div>
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {items.map(item => (
-          <div key={item._id} style={itemCard}>
+          <div key={item._id} style={s.itemCard}>
             <div style={{ flex: 1 }}>
-              <p style={itemTitle}>{item.title}</p>
-              <p style={itemMeta}>{item.category} · {item.year} · {item.tech?.join(', ')}</p>
+              <p style={s.itemTitle}>{item.title}</p>
+              <p style={s.itemMeta}>{item.category} · {item.year} · {item.tech?.join(', ')}</p>
             </div>
-            <button onClick={() => handleEdit(item)} style={iconBtn}><FiEdit2 size={14} /></button>
-            <button onClick={() => handleDelete(item._id)} style={{...iconBtn,color:'#c97b7b'}}><FiTrash2 size={14} /></button>
+            <button onClick={() => handleEdit(item)} style={s.iconBtn}><FiEdit2 size={14} /></button>
+            <button onClick={() => handleDelete(item._id)} style={{...s.iconBtn,color:'#c97b7b'}}><FiTrash2 size={14} /></button>
           </div>
         ))}
       </div>
@@ -223,46 +219,41 @@ function ProjectsTab() {
 }
 
 // ---- MESSAGES TAB ----
-function MessagesTab() {
+function MessagesTab({ isDark }) {
   const api = useApi('messages')
   const [items, setItems] = useState([])
   const [selected, setSelected] = useState(null)
+  const s = getStyles(isDark)
 
-  useEffect(() => { api.get().then(setItems) }, [])
-
-  const handleDelete = async id => {
-    if (!confirm('Delete?')) return
-    await api.del(id)
-    setItems(items.filter(i => i._id !== id))
-    if (selected?._id === id) setSelected(null)
-  }
+  useEffect(() => { api.get().then(data => { if (Array.isArray(data)) setItems(data) }) }, [])
+  const handleDelete = async id => { if (!confirm('Delete?')) return; await api.del(id); setItems(items.filter(i => i._id !== id)); if (selected?._id === id) setSelected(null) }
 
   return (
     <div>
-      <h2 style={{ ...sectionTitle, marginBottom: '24px' }}>Messages ({items.length})</h2>
+      <h2 style={{ ...s.sectionTitle, marginBottom: '24px' }}>Messages ({items.length})</h2>
       <div style={{ display: 'grid', gridTemplateColumns: selected ? '1fr 1fr' : '1fr', gap: '20px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {items.length === 0 && <p style={{ color: 'rgba(232,224,213,0.4)', fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }}>No messages yet.</p>}
+          {items.length === 0 && <p style={{ color: s.muted, fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }}>No messages yet.</p>}
           {items.map(item => (
-            <div key={item._id} onClick={() => setSelected(item)} style={{ ...itemCard, cursor: 'pointer', borderColor: selected?._id === item._id ? '#b47c7c' : 'rgba(232,224,213,0.08)' }}>
+            <div key={item._id} onClick={() => setSelected(item)} style={{ ...s.itemCard, cursor: 'pointer', borderColor: selected?._id === item._id ? '#b47c7c' : s.cardBorder }}>
               <div style={{ flex: 1 }}>
-                <p style={itemTitle}>{item.name} <span style={{ color: '#c9a882', fontSize: '0.72rem' }}>— {item.email}</span></p>
-                <p style={itemMeta}>{item.subject || 'No subject'} · {new Date(item.createdAt).toLocaleDateString()}</p>
+                <p style={s.itemTitle}>{item.name} <span style={{ color: '#c9a882', fontSize: '0.72rem' }}>— {item.email}</span></p>
+                <p style={s.itemMeta}>{item.subject || 'No subject'} · {new Date(item.createdAt).toLocaleDateString()}</p>
               </div>
-              <button onClick={e => { e.stopPropagation(); handleDelete(item._id) }} style={{ ...iconBtn, color: '#c97b7b' }}><FiTrash2 size={14} /></button>
+              <button onClick={e => { e.stopPropagation(); handleDelete(item._id) }} style={{...s.iconBtn,color:'#c97b7b'}}><FiTrash2 size={14} /></button>
             </div>
           ))}
         </div>
         {selected && (
-          <div style={formCard}>
+          <div style={s.formCard}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <p style={itemTitle}>{selected.name}</p>
-              <button onClick={() => setSelected(null)} style={iconBtn}><FiX size={14} /></button>
+              <p style={s.itemTitle}>{selected.name}</p>
+              <button onClick={() => setSelected(null)} style={s.iconBtn}><FiX size={14} /></button>
             </div>
-            <p style={itemMeta}>{selected.email} · {new Date(selected.createdAt).toLocaleDateString()}</p>
-            {selected.subject && <p style={{ ...itemMeta, color: '#c9a882', marginTop: '4px' }}>{selected.subject}</p>}
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.88rem', color: 'rgba(232,224,213,0.8)', lineHeight: 1.75, marginTop: '16px', borderTop: '1px solid rgba(232,224,213,0.08)', paddingTop: '16px' }}>{selected.message}</p>
-            <a href={`mailto:${selected.email}`} style={{ ...saveBtn, display: 'inline-flex', marginTop: '16px', textDecoration: 'none' }}>Reply</a>
+            <p style={s.itemMeta}>{selected.email} · {new Date(selected.createdAt).toLocaleDateString()}</p>
+            {selected.subject && <p style={{ ...s.itemMeta, color: '#c9a882', marginTop: '4px' }}>{selected.subject}</p>}
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.88rem', color: s.text, lineHeight: 1.75, marginTop: '16px', borderTop: `1px solid ${s.cardBorder}`, paddingTop: '16px' }}>{selected.message}</p>
+            <a href={`mailto:${selected.email}`} style={{ ...s.saveBtn, display: 'inline-flex', marginTop: '16px', textDecoration: 'none' }}>Reply</a>
           </div>
         )}
       </div>
@@ -271,65 +262,58 @@ function MessagesTab() {
 }
 
 // ---- GENERIC TAB ----
-function GenericTab({ endpoint, fields, title }) {
+function GenericTab({ endpoint, fields, title, isDark }) {
   const api = useApi(endpoint)
   const [items, setItems] = useState([])
   const [form, setForm] = useState(() => fields.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {}))
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
+  const s = getStyles(isDark)
 
-  useEffect(() => { api.get().then(setItems) }, [])
-
+  useEffect(() => { api.get().then(data => { if (Array.isArray(data)) setItems(data) }) }, [])
   const resetForm = () => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {})); setEditing(null); setShowForm(false) }
-
   const handleSave = async () => {
-    if (editing) {
-      const updated = await api.put(editing, form)
-      setItems(items.map(i => i._id === editing ? updated : i))
-    } else {
-      const created = await api.post(form)
-      setItems([...items, created])
-    }
+    if (editing) { const u = await api.put(editing, form); setItems(items.map(i => i._id === editing ? u : i)) }
+    else { const c = await api.post(form); setItems([...items, c]) }
     resetForm()
   }
-
   const handleEdit = item => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: item[f.key] || '' }), {})); setEditing(item._id); setShowForm(true) }
   const handleDelete = async id => { if (!confirm('Delete?')) return; await api.del(id); setItems(items.filter(i => i._id !== id)) }
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 style={sectionTitle}>{title} ({items.length})</h2>
-        <button onClick={() => { setShowForm(!showForm); resetForm() }} style={addBtn}><FiPlus size={14} /> Add</button>
+        <h2 style={s.sectionTitle}>{title} ({items.length})</h2>
+        <button onClick={() => { setShowForm(!showForm); resetForm() }} style={s.addBtn}><FiPlus size={14} /> Add</button>
       </div>
       {showForm && (
-        <div style={formCard}>
-          <div style={formGrid2}>
+        <div style={s.formCard}>
+          <div style={s.formGrid2}>
             {fields.map(f => (
               <div key={f.key} style={f.full ? { gridColumn: '1 / -1' } : {}}>
-                <label style={formLabel}>{f.label}</label>
+                <label style={s.formLabel}>{f.label}</label>
                 {f.textarea
-                  ? <textarea value={form[f.key]} onChange={e => setForm({...form,[f.key]:e.target.value})} placeholder={f.placeholder} rows={3} style={{...formInput,resize:'vertical'}} />
-                  : <input value={form[f.key]} onChange={e => setForm({...form,[f.key]:e.target.value})} placeholder={f.placeholder} style={formInput} />
+                  ? <textarea value={form[f.key] || ''} onChange={e => setForm({...form,[f.key]:e.target.value})} placeholder={f.placeholder} rows={3} style={{...s.formInput,resize:'vertical'}} />
+                  : <input value={form[f.key] || ''} onChange={e => setForm({...form,[f.key]:e.target.value})} placeholder={f.placeholder} style={s.formInput} />
                 }
               </div>
             ))}
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button onClick={handleSave} style={saveBtn}><FiCheck size={13} /> {editing ? 'Update' : 'Save'}</button>
-            <button onClick={resetForm} style={cancelBtn}><FiX size={13} /> Cancel</button>
+            <button onClick={handleSave} style={s.saveBtn}><FiCheck size={13} /> {editing ? 'Update' : 'Save'}</button>
+            <button onClick={resetForm} style={s.cancelBtn}><FiX size={13} /> Cancel</button>
           </div>
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {items.map(item => (
-          <div key={item._id} style={itemCard}>
+          <div key={item._id} style={s.itemCard}>
             <div style={{ flex: 1 }}>
-              <p style={itemTitle}>{item[fields[0].key]}</p>
-              {fields[1] && <p style={itemMeta}>{item[fields[1].key]}</p>}
+              <p style={s.itemTitle}>{item[fields[0].key]}</p>
+              {fields[1] && <p style={s.itemMeta}>{item[fields[1].key]}</p>}
             </div>
-            <button onClick={() => handleEdit(item)} style={iconBtn}><FiEdit2 size={14} /></button>
-            <button onClick={() => handleDelete(item._id)} style={{...iconBtn,color:'#c97b7b'}}><FiTrash2 size={14} /></button>
+            <button onClick={() => handleEdit(item)} style={s.iconBtn}><FiEdit2 size={14} /></button>
+            <button onClick={() => handleDelete(item._id)} style={{...s.iconBtn,color:'#c97b7b'}}><FiTrash2 size={14} /></button>
           </div>
         ))}
       </div>
@@ -370,35 +354,38 @@ const tabConfigs = {
   ]},
 }
 
-// ---- MAIN DASHBOARD ----
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('profile')
-  const [isDark, setIsDark] = useState(true)
+  const [isDark, setIsDark] = useState(false)
   const navigate = useNavigate()
 
   const handleLogout = () => { localStorage.removeItem('adminToken'); navigate('/admin') }
 
-  const bg = isDark ? '#0a0a0a' : '#f5f0eb'
-  const sidebarBg = isDark ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.6)'
-  const sidebarBorder = isDark ? 'rgba(232,224,213,0.08)' : 'rgba(44,44,44,0.12)'
+  const bg = isDark ? '#0a0a0a' : '#faf7f2'
+  const sidebarBg = isDark ? 'rgba(255,255,255,0.02)' : '#ffffff'
+  const sidebarBorder = isDark ? 'rgba(232,224,213,0.08)' : 'rgba(44,44,44,0.1)'
+  const logoColor = '#b47c7c'
+  const subColor = isDark ? 'rgba(232,224,213,0.35)' : 'rgba(44,44,44,0.4)'
+  const tabActiveColor = '#b47c7c'
+  const tabInactiveColor = isDark ? 'rgba(232,224,213,0.45)' : 'rgba(44,44,44,0.55)'
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: bg, display: 'flex', transition: 'background 0.3s' }}>
 
       {/* Sidebar */}
-      <div style={{ width: '220px', flexShrink: 0, backgroundColor: sidebarBg, borderRight: `1px solid ${sidebarBorder}`, padding: '32px 0', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '220px', flexShrink: 0, backgroundColor: sidebarBg, borderRight: `1px solid ${sidebarBorder}`, padding: '32px 0', display: 'flex', flexDirection: 'column', boxShadow: isDark ? 'none' : '2px 0 8px rgba(0,0,0,0.04)' }}>
         <div style={{ padding: '0 24px 24px', borderBottom: `1px solid ${sidebarBorder}` }}>
-          <p style={{ fontFamily: 'var(--font-script)', fontSize: '1.8rem', color: '#b47c7c' }}>Ayeshi</p>
-          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.58rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: isDark ? 'rgba(232,224,213,0.35)' : 'rgba(44,44,44,0.4)', marginTop: '4px' }}>Admin Panel</p>
+          <p style={{ fontFamily: 'var(--font-script)', fontSize: '1.8rem', color: logoColor }}>Ayeshi</p>
+          <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.58rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: subColor, marginTop: '4px' }}>Admin Panel</p>
         </div>
 
         <nav style={{ flex: 1, padding: '16px 0' }}>
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
               width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
-              padding: '11px 24px', background: activeTab === tab.id ? 'rgba(180,124,124,0.12)' : 'none',
+              padding: '11px 24px', background: activeTab === tab.id ? 'rgba(180,124,124,0.1)' : 'none',
               border: 'none', borderLeft: activeTab === tab.id ? '2px solid #b47c7c' : '2px solid transparent',
-              color: activeTab === tab.id ? '#b47c7c' : isDark ? 'rgba(232,224,213,0.45)' : 'rgba(44,44,44,0.55)',
+              color: activeTab === tab.id ? tabActiveColor : tabInactiveColor,
               fontFamily: 'var(--font-sans)', fontSize: '0.75rem', fontWeight: 500, letterSpacing: '0.08em',
               cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s',
             }}>
@@ -408,11 +395,10 @@ export default function AdminDashboard() {
         </nav>
 
         <div style={{ padding: '16px 24px', borderTop: `1px solid ${sidebarBorder}`, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {/* Theme Toggle */}
           <button onClick={() => setIsDark(!isDark)} style={{
             display: 'flex', alignItems: 'center', gap: '8px', background: 'none',
-            border: `1px solid ${isDark ? 'rgba(232,224,213,0.15)' : 'rgba(44,44,44,0.2)'}`,
-            color: isDark ? 'rgba(232,224,213,0.55)' : 'rgba(44,44,44,0.6)',
+            border: `1px solid ${sidebarBorder}`,
+            color: tabInactiveColor,
             fontFamily: 'var(--font-sans)', fontSize: '0.68rem', letterSpacing: '0.1em',
             padding: '8px 16px', cursor: 'pointer', borderRadius: '2px', width: '100%', justifyContent: 'center',
           }}>
@@ -420,11 +406,10 @@ export default function AdminDashboard() {
             {isDark ? 'Light Mode' : 'Dark Mode'}
           </button>
 
-          {/* Logout */}
           <button onClick={handleLogout} style={{
             display: 'flex', alignItems: 'center', gap: '8px', background: 'none',
-            border: `1px solid ${isDark ? 'rgba(232,224,213,0.15)' : 'rgba(44,44,44,0.2)'}`,
-            color: isDark ? 'rgba(232,224,213,0.45)' : 'rgba(44,44,44,0.5)',
+            border: `1px solid ${sidebarBorder}`,
+            color: tabInactiveColor,
             fontFamily: 'var(--font-sans)', fontSize: '0.68rem', letterSpacing: '0.1em',
             padding: '8px 16px', cursor: 'pointer', borderRadius: '2px', width: '100%', justifyContent: 'center',
           }}>
@@ -434,18 +419,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content */}
-      <div style={{
-        flex: 1, padding: '48px', overflowY: 'auto',
-        color: isDark ? '#e8e0d5' : '#2c2c2c',
-        '--form-input-color': isDark ? '#e8e0d5' : '#2c2c2c',
-      }}>
-        {activeTab === 'profile' && <ProfileTab />}
-        {activeTab === 'projects' && <ProjectsTab />}
-        {activeTab === 'messages' && <MessagesTab />}
-        {activeTab === 'education' && <GenericTab endpoint="education" title="Education" fields={tabConfigs.education.fields} />}
-        {activeTab === 'experience' && <GenericTab endpoint="experience" title="Experience" fields={tabConfigs.experience.fields} />}
-        {activeTab === 'certificates' && <GenericTab endpoint="certificates" title="Certificates" fields={tabConfigs.certificates.fields} />}
-        {activeTab === 'skills' && <GenericTab endpoint="skills" title="Skills" fields={tabConfigs.skills.fields} />}
+      <div style={{ flex: 1, padding: '48px', overflowY: 'auto' }}>
+        {activeTab === 'profile' && <ProfileTab isDark={isDark} />}
+        {activeTab === 'projects' && <ProjectsTab isDark={isDark} />}
+        {activeTab === 'messages' && <MessagesTab isDark={isDark} />}
+        {activeTab === 'education' && <GenericTab endpoint="education" title="Education" fields={tabConfigs.education.fields} isDark={isDark} />}
+        {activeTab === 'experience' && <GenericTab endpoint="experience" title="Experience" fields={tabConfigs.experience.fields} isDark={isDark} />}
+        {activeTab === 'certificates' && <GenericTab endpoint="certificates" title="Certificates" fields={tabConfigs.certificates.fields} isDark={isDark} />}
+        {activeTab === 'skills' && <GenericTab endpoint="skills" title="Skills" fields={tabConfigs.skills.fields} isDark={isDark} />}
       </div>
     </div>
   )
