@@ -29,7 +29,8 @@ app.use(cors({
 }))
 app.use(express.json())
 
-// Serve certificates from /public/certificates
+// Static files
+app.use('/images', express.static(path.join(__dirname, 'public/images')))
 app.use('/certificates', express.static(path.join(__dirname, 'public/certificates')))
 
 // Routes
