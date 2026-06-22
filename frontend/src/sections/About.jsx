@@ -85,7 +85,7 @@ export default function About() {
             position: 'absolute', top: '16px', left: '16px', right: '-16px', bottom: '-16px',
             border: '1px solid rgba(180,124,124,0.3)', zIndex: 0,
           }} />
-          <img src="/avatar.jpg" alt="Ayeshi Jayarathna" style={{
+          <img src={profile.aboutImage ? `http://localhost:5000${profile.aboutImage}` : "/avatar.jpg"} alt="Ayeshi Jayarathna" style={{
             width: '340px', height: '420px', objectFit: 'cover', objectPosition: 'top center',
             display: 'block', position: 'relative', zIndex: 1,
             filter: isDark ? 'brightness(0.88) grayscale(0.1)' : 'grayscale(0.05)',
