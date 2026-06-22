@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FiLogOut, FiPlus, FiEdit2, FiTrash2, FiCheck, FiX, FiSun, FiMoon } from 'react-icons/fi'
+import { FiLogOut, FiPlus, FiEdit2, FiTrash2, FiCheck, FiX, FiSun, FiMoon, FiUpload } from 'react-icons/fi'
 import { BsGrid, BsBook, BsBriefcase, BsAward, BsLightning, BsChatDots, BsPerson } from 'react-icons/bs'
 
 const tabs = [
@@ -25,7 +25,6 @@ function useApi(endpoint) {
   return { get, post, put, putSingle, del }
 }
 
-// Theme-aware styles
 function getStyles(isDark) {
   const text = isDark ? '#e8e0d5' : '#1a1a1a'
   const muted = isDark ? 'rgba(232,224,213,0.55)' : 'rgba(26,26,26,0.55)'
@@ -34,7 +33,6 @@ function getStyles(isDark) {
   const inputBg = isDark ? 'rgba(255,255,255,0.05)' : '#f8f5f0'
   const inputBorder = isDark ? 'rgba(232,224,213,0.12)' : 'rgba(26,26,26,0.15)'
   const labelColor = isDark ? 'rgba(232,224,213,0.45)' : 'rgba(26,26,26,0.5)'
-
   return {
     text, muted, cardBg, cardBorder, inputBg, inputBorder, labelColor,
     sectionTitle: { fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 400, color: text },
@@ -52,6 +50,89 @@ function getStyles(isDark) {
   }
 }
 
+// ---- IMAGE UPLOAD COMPONENT ----
+function ImageUploadBox({ label, currentUrl, onUpload, isDark, endpoint = 'image' }) {
+  const [uploading, setUploading] = useState(false)
+  const [preview, setPreview] = useState(currentUrl || null)
+  const [error, setError] = useState('')
+  const inputRef = useRef(null)
+  const s = getStyles(isDark)
+
+  useEffect(() => { setPreview(currentUrl || null) }, [currentUrl])
+
+  const handleFile = async file => {
+    if (!file) return
+    setUploading(true)
+    setError('')
+    const reader = new FileReader()
+    reader.onload = e => setPreview(e.target.result)
+    reader.readAsDataURL(file)
+
+    const formData = new FormData()
+    formData.append(endpoint === 'certificate' ? 'file' : 'image', file)
+
+    try {
+      const res = await fetch(`/api/upload/${endpoint}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token()}` },
+        body: formData,
+      })
+      const data = await res.json()
+      if (res.ok) onUpload(data.url)
+      else setError(data.error || 'Upload failed')
+    } catch { setError('Upload failed') }
+    finally { setUploading(false) }
+  }
+
+  const baseUrl = 'http://localhost:5000'
+  const displayUrl = preview?.startsWith('/') ? baseUrl + preview : preview
+
+  return (
+    <div>
+      <label style={s.formLabel}>{label}</label>
+      <div
+        onClick={() => inputRef.current?.click()}
+        onDragOver={e => e.preventDefault()}
+        onDrop={e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]) }}
+        style={{
+          border: `1px dashed rgba(180,124,124,0.45)`,
+          borderRadius: '4px',
+          padding: preview ? '8px' : '28px',
+          textAlign: 'center',
+          cursor: 'pointer',
+          backgroundColor: isDark ? 'rgba(180,124,124,0.04)' : 'rgba(180,124,124,0.03)',
+          position: 'relative',
+          transition: 'border-color 0.2s',
+        }}
+      >
+        {displayUrl ? (
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <img src={displayUrl} alt="preview" style={{ maxHeight: '140px', maxWidth: '100%', display: 'block', borderRadius: '3px', objectFit: 'cover' }} />
+            <button
+              onClick={e => { e.stopPropagation(); setPreview(null); onUpload('') }}
+              style={{ position: 'absolute', top: '-8px', right: '-8px', width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#c97b7b', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <FiX size={11} />
+            </button>
+          </div>
+        ) : (
+          <div>
+            <FiUpload size={22} style={{ color: 'rgba(180,124,124,0.5)', marginBottom: '8px' }} />
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', color: s.muted }}>
+              {uploading ? 'Uploading...' : 'Click or drag to upload'}
+            </p>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.62rem', color: s.muted, marginTop: '4px', opacity: 0.6 }}>
+              JPG, PNG, WEBP · Max 5MB
+            </p>
+          </div>
+        )}
+        <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+      </div>
+      {error && <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.72rem', color: '#c97b7b', marginTop: '6px' }}>{error}</p>}
+    </div>
+  )
+}
+
 // ---- PROFILE TAB ----
 function ProfileTab({ isDark }) {
   const api = useApi('profile')
@@ -59,14 +140,14 @@ function ProfileTab({ isDark }) {
   const [saved, setSaved] = useState(false)
   const s = getStyles(isDark)
 
-  useEffect(() => { api.get().then(setProfile) }, [])
+  useEffect(() => { api.get().then(data => { if (data?._id) setProfile(data) }) }, [])
 
-  const handleChange = (key, value) => setProfile({ ...profile, [key]: value })
-  const handleRolesChange = val => setProfile({ ...profile, roles: val.split(',').map(r => r.trim()).filter(Boolean) })
+  const handleChange = (key, value) => setProfile(p => ({ ...p, [key]: value }))
+  const handleRolesChange = val => setProfile(p => ({ ...p, roles: val.split(',').map(r => r.trim()).filter(Boolean) }))
   const handleStatChange = (i, key, val) => {
-    const stats = [...profile.stats]
+    const stats = [...(profile.stats || [])]
     stats[i] = { ...stats[i], [key]: val }
-    setProfile({ ...profile, stats })
+    setProfile(p => ({ ...p, stats }))
   }
   const handleSave = async () => {
     await api.putSingle(profile)
@@ -85,8 +166,20 @@ function ProfileTab({ isDark }) {
         </button>
       </div>
 
+      {/* HOME SECTION */}
       <div style={s.formCard}>
         <p style={{ ...s.formLabel, fontSize: '0.7rem', color: '#c9a882', marginBottom: '20px' }}>HOME SECTION</p>
+
+        {/* Hero Image Upload */}
+        <div style={{ marginBottom: '20px' }}>
+          <ImageUploadBox
+            label="Hero Image (Right side photo)"
+            currentUrl={profile.heroImage}
+            onUpload={url => handleChange('heroImage', url)}
+            isDark={isDark}
+          />
+        </div>
+
         <div style={s.formGrid2}>
           <div style={{ gridColumn: '1 / -1' }}>
             <label style={s.formLabel}>Full Name</label>
@@ -97,7 +190,7 @@ function ProfileTab({ isDark }) {
             <textarea value={profile.tagline || ''} onChange={e => handleChange('tagline', e.target.value)} rows={3} style={{ ...s.formInput, resize: 'vertical' }} />
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
-            <label style={s.formLabel}>Roles (comma separated — typewriter)</label>
+            <label style={s.formLabel}>Roles (comma separated)</label>
             <input value={profile.roles?.join(', ') || ''} onChange={e => handleRolesChange(e.target.value)} style={s.formInput} placeholder="Full Stack Engineer, UI/UX Designer..." />
           </div>
           <div>
@@ -123,8 +216,20 @@ function ProfileTab({ isDark }) {
         </div>
       </div>
 
+      {/* ABOUT SECTION */}
       <div style={s.formCard}>
         <p style={{ ...s.formLabel, fontSize: '0.7rem', color: '#c9a882', marginBottom: '20px' }}>ABOUT SECTION</p>
+
+        {/* About Image Upload */}
+        <div style={{ marginBottom: '20px' }}>
+          <ImageUploadBox
+            label="About Image (Left side photo)"
+            currentUrl={profile.aboutImage}
+            onUpload={url => handleChange('aboutImage', url)}
+            isDark={isDark}
+          />
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={s.formLabel}>Heading</label>
@@ -141,7 +246,7 @@ function ProfileTab({ isDark }) {
           <div>
             <label style={{ ...s.formLabel, marginBottom: '12px' }}>Stats</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-              {profile.stats?.map((stat, i) => (
+              {(profile.stats || []).map((stat, i) => (
                 <div key={i} style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8f5f0', border: `1px solid ${s.cardBorder}`, borderRadius: '4px', padding: '12px' }}>
                   <input value={stat.value || ''} onChange={e => handleStatChange(i, 'value', e.target.value)} placeholder="10+" style={{ ...s.formInput, marginBottom: '8px', fontSize: '0.8rem' }} />
                   <input value={stat.label || ''} onChange={e => handleStatChange(i, 'label', e.target.value)} placeholder="Projects" style={{ ...s.formInput, fontSize: '0.8rem' }} />
@@ -159,14 +264,13 @@ function ProfileTab({ isDark }) {
 function ProjectsTab({ isDark }) {
   const api = useApi('projects')
   const [items, setItems] = useState([])
-  const [form, setForm] = useState({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '' })
+  const [form, setForm] = useState({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '', image: '' })
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const s = getStyles(isDark)
 
   useEffect(() => { api.get().then(data => { if (Array.isArray(data)) setItems(data) }) }, [])
-
-  const resetForm = () => { setForm({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '' }); setEditing(null); setShowForm(false) }
+  const resetForm = () => { setForm({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '', image: '' }); setEditing(null); setShowForm(false) }
   const handleSave = async () => {
     const payload = { ...form, tech: form.tech.split(',').map(t => t.trim()).filter(Boolean) }
     if (editing) { const u = await api.put(editing, payload); setItems(items.map(i => i._id === editing ? u : i)) }
@@ -184,16 +288,25 @@ function ProjectsTab({ isDark }) {
       </div>
       {showForm && (
         <div style={s.formCard}>
+          {/* Project Image Upload */}
+          <div style={{ marginBottom: '20px' }}>
+            <ImageUploadBox
+              label="Project Image"
+              currentUrl={form.image}
+              onUpload={url => setForm(f => ({ ...f, image: url }))}
+              isDark={isDark}
+            />
+          </div>
           <div style={s.formGrid2}>
             {[['title','Title','Project title'],['category','Category','Fullstack / UI/UX'],['tech','Tech (comma separated)','React, Node.js...'],['github','GitHub URL','https://...'],['live','Live URL','https://...'],['year','Year','2024']].map(([key,label,ph]) => (
               <div key={key}>
                 <label style={s.formLabel}>{label}</label>
-                <input value={form[key] || ''} onChange={e => setForm({...form,[key]:e.target.value})} placeholder={ph} style={s.formInput} />
+                <input value={form[key] || ''} onChange={e => setForm(f => ({...f,[key]:e.target.value}))} placeholder={ph} style={s.formInput} />
               </div>
             ))}
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={s.formLabel}>Description</label>
-              <textarea value={form.description || ''} onChange={e => setForm({...form,description:e.target.value})} rows={3} style={{...s.formInput,resize:'vertical'}} />
+              <textarea value={form.description || ''} onChange={e => setForm(f => ({...f,description:e.target.value}))} rows={3} style={{...s.formInput,resize:'vertical'}} />
             </div>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
@@ -205,6 +318,7 @@ function ProjectsTab({ isDark }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {items.map(item => (
           <div key={item._id} style={s.itemCard}>
+            {item.image && <img src={item.image.startsWith('/') ? 'http://localhost:5000' + item.image : item.image} alt="" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '3px', flexShrink: 0 }} />}
             <div style={{ flex: 1 }}>
               <p style={s.itemTitle}>{item.title}</p>
               <p style={s.itemMeta}>{item.category} · {item.year} · {item.tech?.join(', ')}</p>
@@ -288,13 +402,25 @@ function GenericTab({ endpoint, fields, title, isDark }) {
       </div>
       {showForm && (
         <div style={s.formCard}>
+          {/* Certificate image upload */}
+          {endpoint === 'certificates' && (
+            <div style={{ marginBottom: '20px' }}>
+              <ImageUploadBox
+                label="Certificate Image"
+                currentUrl={form.image}
+                onUpload={url => setForm(f => ({ ...f, image: url }))}
+                isDark={isDark}
+                endpoint="certificate"
+              />
+            </div>
+          )}
           <div style={s.formGrid2}>
-            {fields.map(f => (
+            {fields.filter(f => f.key !== 'image').map(f => (
               <div key={f.key} style={f.full ? { gridColumn: '1 / -1' } : {}}>
                 <label style={s.formLabel}>{f.label}</label>
                 {f.textarea
-                  ? <textarea value={form[f.key] || ''} onChange={e => setForm({...form,[f.key]:e.target.value})} placeholder={f.placeholder} rows={3} style={{...s.formInput,resize:'vertical'}} />
-                  : <input value={form[f.key] || ''} onChange={e => setForm({...form,[f.key]:e.target.value})} placeholder={f.placeholder} style={s.formInput} />
+                  ? <textarea value={form[f.key] || ''} onChange={e => setForm(p => ({...p,[f.key]:e.target.value}))} placeholder={f.placeholder} rows={3} style={{...s.formInput,resize:'vertical'}} />
+                  : <input value={form[f.key] || ''} onChange={e => setForm(p => ({...p,[f.key]:e.target.value}))} placeholder={f.placeholder} style={s.formInput} />
                 }
               </div>
             ))}
@@ -308,6 +434,14 @@ function GenericTab({ endpoint, fields, title, isDark }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {items.map(item => (
           <div key={item._id} style={s.itemCard}>
+            {item.image && (
+              <img
+                src={item.image.startsWith('/') ? 'http://localhost:5000' + item.image : item.image}
+                alt=""
+                style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '3px', flexShrink: 0 }}
+                onError={e => e.target.style.display = 'none'}
+              />
+            )}
             <div style={{ flex: 1 }}>
               <p style={s.itemTitle}>{item[fields[0].key]}</p>
               {fields[1] && <p style={s.itemMeta}>{item[fields[1].key]}</p>}
@@ -344,7 +478,7 @@ const tabConfigs = {
     { key: 'issuer', label: 'Issuer', placeholder: 'Coursera / Google' },
     { key: 'date', label: 'Date', placeholder: 'Dec 2023' },
     { key: 'link', label: 'Verify URL', placeholder: 'https://...' },
-    { key: 'image', label: 'Image path', placeholder: '/certificates/cert1.jpg' },
+    { key: 'image', label: 'Image', placeholder: '' },
   ]},
   skills: { fields: [
     { key: 'name', label: 'Skill Name', placeholder: 'React' },
@@ -358,27 +492,22 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('profile')
   const [isDark, setIsDark] = useState(false)
   const navigate = useNavigate()
-
   const handleLogout = () => { localStorage.removeItem('adminToken'); navigate('/admin') }
 
   const bg = isDark ? '#0a0a0a' : '#faf7f2'
   const sidebarBg = isDark ? 'rgba(255,255,255,0.02)' : '#ffffff'
   const sidebarBorder = isDark ? 'rgba(232,224,213,0.08)' : 'rgba(44,44,44,0.1)'
-  const logoColor = '#b47c7c'
-  const subColor = isDark ? 'rgba(232,224,213,0.35)' : 'rgba(44,44,44,0.4)'
   const tabActiveColor = '#b47c7c'
   const tabInactiveColor = isDark ? 'rgba(232,224,213,0.45)' : 'rgba(44,44,44,0.55)'
+  const subColor = isDark ? 'rgba(232,224,213,0.35)' : 'rgba(44,44,44,0.4)'
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: bg, display: 'flex', transition: 'background 0.3s' }}>
-
-      {/* Sidebar */}
       <div style={{ width: '220px', flexShrink: 0, backgroundColor: sidebarBg, borderRight: `1px solid ${sidebarBorder}`, padding: '32px 0', display: 'flex', flexDirection: 'column', boxShadow: isDark ? 'none' : '2px 0 8px rgba(0,0,0,0.04)' }}>
         <div style={{ padding: '0 24px 24px', borderBottom: `1px solid ${sidebarBorder}` }}>
-          <p style={{ fontFamily: 'var(--font-script)', fontSize: '1.8rem', color: logoColor }}>Ayeshi</p>
+          <p style={{ fontFamily: 'var(--font-script)', fontSize: '1.8rem', color: '#b47c7c' }}>Ayeshi</p>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.58rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: subColor, marginTop: '4px' }}>Admin Panel</p>
         </div>
-
         <nav style={{ flex: 1, padding: '16px 0' }}>
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
@@ -393,32 +522,16 @@ export default function AdminDashboard() {
             </button>
           ))}
         </nav>
-
         <div style={{ padding: '16px 24px', borderTop: `1px solid ${sidebarBorder}`, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button onClick={() => setIsDark(!isDark)} style={{
-            display: 'flex', alignItems: 'center', gap: '8px', background: 'none',
-            border: `1px solid ${sidebarBorder}`,
-            color: tabInactiveColor,
-            fontFamily: 'var(--font-sans)', fontSize: '0.68rem', letterSpacing: '0.1em',
-            padding: '8px 16px', cursor: 'pointer', borderRadius: '2px', width: '100%', justifyContent: 'center',
-          }}>
-            {isDark ? <FiSun size={13} /> : <FiMoon size={13} />}
-            {isDark ? 'Light Mode' : 'Dark Mode'}
+          <button onClick={() => setIsDark(!isDark)} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: `1px solid ${sidebarBorder}`, color: tabInactiveColor, fontFamily: 'var(--font-sans)', fontSize: '0.68rem', letterSpacing: '0.1em', padding: '8px 16px', cursor: 'pointer', borderRadius: '2px', width: '100%', justifyContent: 'center' }}>
+            {isDark ? <FiSun size={13} /> : <FiMoon size={13} />} {isDark ? 'Light Mode' : 'Dark Mode'}
           </button>
-
-          <button onClick={handleLogout} style={{
-            display: 'flex', alignItems: 'center', gap: '8px', background: 'none',
-            border: `1px solid ${sidebarBorder}`,
-            color: tabInactiveColor,
-            fontFamily: 'var(--font-sans)', fontSize: '0.68rem', letterSpacing: '0.1em',
-            padding: '8px 16px', cursor: 'pointer', borderRadius: '2px', width: '100%', justifyContent: 'center',
-          }}>
+          <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: `1px solid ${sidebarBorder}`, color: tabInactiveColor, fontFamily: 'var(--font-sans)', fontSize: '0.68rem', letterSpacing: '0.1em', padding: '8px 16px', cursor: 'pointer', borderRadius: '2px', width: '100%', justifyContent: 'center' }}>
             <FiLogOut size={13} /> Logout
           </button>
         </div>
       </div>
 
-      {/* Main Content */}
       <div style={{ flex: 1, padding: '48px', overflowY: 'auto' }}>
         {activeTab === 'profile' && <ProfileTab isDark={isDark} />}
         {activeTab === 'projects' && <ProjectsTab isDark={isDark} />}
