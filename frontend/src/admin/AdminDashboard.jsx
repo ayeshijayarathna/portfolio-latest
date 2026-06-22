@@ -398,7 +398,7 @@ function GenericTab({ endpoint, fields, title, isDark }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h2 style={s.sectionTitle}>{title} ({items.length})</h2>
-        <button onClick={() => { setShowForm(!showForm); resetForm() }} style={s.addBtn}><FiPlus size={14} /> Add</button>
+        <button onClick={() => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {})); setEditing(null); setShowForm(prev => !prev) }} style={s.addBtn}><FiPlus size={14} /> Add</button>
       </div>
       {showForm && (
         <div style={s.formCard}>
