@@ -79,16 +79,16 @@ export default function Home() {
         <div style={{ marginBottom: '24px', lineHeight: 1.2 }}>
           <p style={{
             fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
-            fontWeight: 600, color: isDark ? '#e8e0d5' : '#2c2c2c', letterSpacing: '0.03em',
+            fontWeight: 400, color: isDark ? '#e8e0d5' : '#2c2c2c', letterSpacing: '0.03em',
           }}>
-            DESIGNER · ENGINEER
+            Designer · Developer
           </p>
           <p style={{
             fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 3rem)',
-            fontWeight: 400, fontStyle: 'italic',
+            fontWeight: 200, fontStyle: 'italic',
             color: isDark ? 'rgba(232,224,213,0.35)' : 'rgba(44,44,44,0.28)', letterSpacing: '0.03em',
           }}>
-            Storyteller
+            Designing & Building Digital Experiences
           </p>
         </div>
 
