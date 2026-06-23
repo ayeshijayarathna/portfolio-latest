@@ -15,18 +15,25 @@ import AdminLogin from './admin/AdminLogin'
 import AdminDashboard from './admin/AdminDashboard'
 import ProtectedRoute from './admin/ProtectedRoute'
 
+import TechBackground from './components/TechBackground'
+import CustomCursor from './components/CustomCursor'
+
 function Portfolio() {
   return (
     <>
-      <Navbar />
-      <Home />
-      <About />
-      <Education />
-      <Certificates />
-      <Experience />
-      <Projects />
-      <Skills />
-      <Contact />
+      <TechBackground />
+      <CustomCursor />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Navbar />
+        <Home />
+        <About />
+        <Education />
+        <Certificates />
+        <Experience />
+        <Projects />
+        <Skills />
+        <Contact />
+      </div>
     </>
   )
 }
