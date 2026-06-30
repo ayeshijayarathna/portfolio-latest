@@ -1,11 +1,13 @@
 import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
 import { FiCode, FiLayers, FiTrendingUp, FiUsers } from 'react-icons/fi'
+import ScrollReveal from '../components/ScrollReveal'
 
 const defaultProfile = {
   aboutHeading: 'Crafting digital experiences with purpose.',
-  aboutBio1: "I'm Ayeshi — a fullstack engineer and UI designer who loves turning complex problems into elegant, user-centric solutions. With a background spanning software engineering, business analysis, and project management, I bring a rare multi-dimensional perspective to every project I touch.",
-  aboutBio2: "I believe great products are born at the intersection of technical precision and thoughtful design. Whether I'm architecting a backend system, crafting pixel-perfect interfaces, or analysing business requirements — I bring the same quiet dedication to every layer of the stack.",
+  aboutBio1: "I'm Ayeshi — a fullstack engineer and UI designer who loves turning complex problems into elegant, user-centric solutions.",
+  aboutBio2: "I believe great products are born at the intersection of technical precision and thoughtful design.",
+  aboutImage: '',
   stats: [
     { value: '10+', label: 'Projects Completed' },
     { value: '3+', label: 'Years Experience' },
@@ -19,7 +21,6 @@ const statIcons = [<FiCode size={18} />, <FiTrendingUp size={18} />, <FiLayers s
 function CountUp({ target, start }) {
   const [count, setCount] = useState(0)
   const num = parseInt(target) || 0
-
   useEffect(() => {
     if (!start || !num) return
     let current = 0
@@ -32,7 +33,6 @@ function CountUp({ target, start }) {
     }, 1800 / steps)
     return () => clearInterval(timer)
   }, [start, num])
-
   const suffix = target?.replace(/[0-9]/g, '') || ''
   return <>{count}{suffix}</>
 }
@@ -44,17 +44,11 @@ export default function About() {
   const [profile, setProfile] = useState(defaultProfile)
 
   useEffect(() => {
-    fetch('/api/profile')
-      .then(r => r.json())
-      .then(data => { if (data?._id) setProfile(data) })
-      .catch(() => {})
+    fetch('/api/profile').then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
   }, [])
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setAnimateStats(true); observer.disconnect() } },
-      { threshold: 0.3 }
-    )
+    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setAnimateStats(true); observer.disconnect() } }, { threshold: 0.3 })
     if (sectionRef.current) observer.observe(sectionRef.current)
     return () => observer.disconnect()
   }, [])
@@ -63,81 +57,69 @@ export default function About() {
   const muted = isDark ? 'rgba(232,224,213,0.6)' : 'rgba(44,44,44,0.6)'
   const border = isDark ? 'rgba(232,224,213,0.08)' : 'rgba(44,44,44,0.08)'
   const cardBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(44,44,44,0.03)'
-
-  const headingParts = profile.aboutHeading?.split('with purpose') || [profile.aboutHeading, '']
+  const baseUrl = 'http://localhost:5000'
 
   return (
     <section id="about" ref={sectionRef} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', padding: '100px 6vw', position: 'relative' }}>
-
-      <p style={{
-        position: 'absolute', top: '60px', left: '6vw',
-        fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500,
-        letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882',
-      }}>
-        01 — About
-      </p>
+      <ScrollReveal variant="fadeUp" delay={0.1} style={{ position: 'absolute', top: '60px', left: '6vw' }}>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882' }}>
+          01 — About
+        </p>
+      </ScrollReveal>
 
       <div style={{ display: 'flex', gap: '80px', alignItems: 'center', width: '100%' }} className="about-grid">
 
         {/* Photo */}
-        <div style={{ flex: '0 0 auto', position: 'relative' }}>
-          <div style={{
-            position: 'absolute', top: '16px', left: '16px', right: '-16px', bottom: '-16px',
-            border: '1px solid rgba(180,124,124,0.3)', zIndex: 0,
-          }} />
-          <img src={profile.aboutImage ? `http://localhost:5000${profile.aboutImage}` : "/avatar.jpg"} alt="Ayeshi Jayarathna" style={{
-            width: '340px', height: '420px', objectFit: 'cover', objectPosition: 'top center',
-            display: 'block', position: 'relative', zIndex: 1,
-            filter: isDark ? 'brightness(0.88) grayscale(0.1)' : 'grayscale(0.05)',
-          }} />
-        </div>
+        <ScrollReveal variant="fadeLeft" delay={0.2} style={{ flex: '0 0 auto', position: 'relative' }}>
+          <div style={{ position: 'absolute', top: '16px', left: '16px', right: '-16px', bottom: '-16px', border: '1px solid rgba(180,124,124,0.3)', zIndex: 0 }} />
+          <img
+            src={profile.aboutImage ? `${baseUrl}${profile.aboutImage}` : '/avatar.jpg'}
+            alt="Ayeshi"
+            style={{ width: '340px', height: '420px', objectFit: 'cover', objectPosition: 'top center', display: 'block', position: 'relative', zIndex: 1, filter: isDark ? 'brightness(0.88)' : 'none' }}
+          />
+        </ScrollReveal>
 
         {/* Content */}
         <div style={{ flex: 1 }}>
-          <h2 style={{
-            fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 3.5vw, 3rem)',
-            fontWeight: 400, color: text, marginBottom: '8px', lineHeight: 1.2,
-          }}>
-            {headingParts[0]}
-            <span style={{ display: 'block', fontStyle: 'italic', color: '#b47c7c' }}>
-              with purpose.
-            </span>
-          </h2>
+          <ScrollReveal variant="blur" delay={0.3}>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 3.5vw, 3rem)', fontWeight: 400, color: text, marginBottom: '8px', lineHeight: 1.2 }}>
+              {(profile.aboutHeading || '').replace('with purpose.', '')}
+              <span style={{ display: 'block', fontStyle: 'italic', color: '#b47c7c' }}>with purpose.</span>
+            </h2>
+          </ScrollReveal>
 
-          <div style={{ width: '40px', height: '1.5px', backgroundColor: '#c9a882', marginBottom: '28px' }} />
+          <ScrollReveal variant="fadeLeft" delay={0.35}>
+            <div style={{ width: '40px', height: '1.5px', backgroundColor: '#c9a882', marginBottom: '28px' }} />
+          </ScrollReveal>
 
-          <p style={{
-            fontFamily: 'var(--font-sans)', fontSize: '0.92rem', fontWeight: 300,
-            lineHeight: 1.85, color: muted, marginBottom: '16px', maxWidth: '520px',
-          }}>
-            {profile.aboutBio1}
-          </p>
+          <ScrollReveal variant="fadeUp" delay={0.4}>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.92rem', fontWeight: 300, lineHeight: 1.85, color: muted, marginBottom: '16px', maxWidth: '520px' }}>
+              {profile.aboutBio1}
+            </p>
+          </ScrollReveal>
 
-          <p style={{
-            fontFamily: 'var(--font-sans)', fontSize: '0.92rem', fontWeight: 300,
-            lineHeight: 1.85, color: muted, marginBottom: '40px', maxWidth: '520px',
-          }}>
-            {profile.aboutBio2}
-          </p>
+          <ScrollReveal variant="fadeUp" delay={0.5}>
+            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.92rem', fontWeight: 300, lineHeight: 1.85, color: muted, marginBottom: '40px', maxWidth: '520px' }}>
+              {profile.aboutBio2}
+            </p>
+          </ScrollReveal>
 
           {/* Stats */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="stats-grid">
             {(profile.stats || []).map((stat, i) => (
-              <div key={i}
-                style={{ padding: '20px 16px', border: `1px solid ${border}`, backgroundColor: cardBg, textAlign: 'center', transition: 'all 0.3s ease' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(180,124,124,0.4)'; e.currentTarget.style.backgroundColor = isDark ? 'rgba(180,124,124,0.06)' : 'rgba(180,124,124,0.05)' }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = border; e.currentTarget.style.backgroundColor = cardBg }}
-              >
-                <div style={{ color: '#b47c7c', marginBottom: '8px', display: 'flex', justifyContent: 'center' }}>
-                  {statIcons[i] || <FiCode size={18} />}
+              <ScrollReveal key={i} variant="scale" delay={0.5 + i * 0.1}>
+                <div style={{ padding: '20px 16px', border: `1px solid ${border}`, backgroundColor: cardBg, textAlign: 'center', transition: 'all 0.3s ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(180,124,124,0.4)'; e.currentTarget.style.backgroundColor = isDark ? 'rgba(180,124,124,0.06)' : 'rgba(180,124,124,0.05)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = border; e.currentTarget.style.backgroundColor = cardBg }}>
+                  <div style={{ color: '#b47c7c', marginBottom: '8px', display: 'flex', justifyContent: 'center' }}>{statIcons[i] || <FiCode size={18} />}</div>
+                  <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', fontWeight: 600, color: text, lineHeight: 1, marginBottom: '6px' }}>
+                    <CountUp target={stat.value} start={animateStats} />
+                  </p>
+                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.62rem', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: muted }}>
+                    {stat.label}
+                  </p>
                 </div>
-                <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', fontWeight: 600, color: text, lineHeight: 1, marginBottom: '6px' }}>
-                  <CountUp target={stat.value} start={animateStats} />
-                </p>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.62rem', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: muted }}>
-                  {stat.label}
-                </p>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
