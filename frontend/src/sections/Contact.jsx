@@ -1,28 +1,34 @@
 import { useTheme } from '../context/ThemeContext'
 import { useState, useEffect } from 'react'
-import { BsLinkedin, BsGithub } from 'react-icons/bs'
+import { BsLinkedin, BsGithub, BsFacebook, BsInstagram, BsWhatsapp, BsTwitterX } from 'react-icons/bs'
 import { MdEmail } from 'react-icons/md'
 import { FiMapPin, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi'
 
 const defaultProfile = {
-  linkedin: 'https://linkedin.com',
-  github: 'https://github.com',
-  email: 'ayeshi@email.com',
-  location: 'Kandy, Sri Lanka',
+  linkedin: '', github: '', email: '', location: 'Kandy, Sri Lanka',
+  facebook: '', instagram: '', whatsapp: '', twitter: '',
 }
+
+const socialConfig = [
+  { key: 'linkedin',  icon: <BsLinkedin size={18} />,  label: 'LinkedIn',  color: '#0077b5', getHref: v => v },
+  { key: 'github',    icon: <BsGithub size={18} />,    label: 'GitHub',    color: '#6e5494', getHref: v => v },
+  { key: 'facebook',  icon: <BsFacebook size={18} />,  label: 'Facebook',  color: '#1877f2', getHref: v => v },
+  { key: 'instagram', icon: <BsInstagram size={18} />, label: 'Instagram', color: '#e1306c', getHref: v => v },
+  { key: 'whatsapp',  icon: <BsWhatsapp size={18} />,  label: 'WhatsApp',  color: '#25d366', getHref: v => `https://wa.me/${v.replace(/\D/g,'')}` },
+  { key: 'twitter',   icon: <BsTwitterX size={16} />,  label: 'X / Twitter', color: '#000000', getHref: v => v },
+  { key: 'email',     icon: <MdEmail size={20} />,     label: 'Email',     color: '#b47c7c', getHref: v => `mailto:${v}` },
+  { key: 'location',  icon: <FiMapPin size={18} />,    label: 'Location',  color: '#c9a882', getHref: null },
+]
 
 export default function Contact() {
   const { isDark } = useTheme()
   const [profile, setProfile] = useState(defaultProfile)
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
-  const [status, setStatus] = useState(null) // null | 'loading' | 'success' | 'error'
+  const [status, setStatus] = useState(null)
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
-    fetch('/api/profile')
-      .then(r => r.json())
-      .then(data => { if (data?._id) setProfile(data) })
-      .catch(() => {})
+    fetch('/api/profile').then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
   }, [])
 
   const text = isDark ? '#e8e0d5' : '#2c2c2c'
@@ -32,15 +38,10 @@ export default function Contact() {
   const inputBg = isDark ? 'rgba(255,255,255,0.04)' : '#ffffff'
 
   const inputStyle = {
-    width: '100%', padding: '13px 16px',
-    backgroundColor: inputBg,
-    border: `1px solid ${cardBorder}`,
-    borderRadius: '3px',
-    fontFamily: 'var(--font-sans)',
-    fontSize: '0.85rem', fontWeight: 300,
-    color: text, outline: 'none',
-    transition: 'border-color 0.3s ease',
-    boxSizing: 'border-box',
+    width: '100%', padding: '13px 16px', backgroundColor: inputBg,
+    border: `1px solid ${cardBorder}`, borderRadius: '3px',
+    fontFamily: 'var(--font-sans)', fontSize: '0.85rem', fontWeight: 300,
+    color: text, outline: 'none', transition: 'border-color 0.3s ease', boxSizing: 'border-box',
   }
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
@@ -50,37 +51,20 @@ export default function Contact() {
   const handleSubmit = async e => {
     e.preventDefault()
     if (!form.name || !form.email || !form.message) return
-    setStatus('loading')
-    setErrorMsg('')
+    setStatus('loading'); setErrorMsg('')
     try {
       const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (res.ok) {
-        setStatus('success')
-        setForm({ name: '', email: '', subject: '', message: '' })
-        setTimeout(() => setStatus(null), 5000)
-      } else {
-        setStatus('error')
-        setErrorMsg(data.error || 'Something went wrong.')
-        setTimeout(() => setStatus(null), 4000)
-      }
-    } catch {
-      setStatus('error')
-      setErrorMsg('Could not connect to server.')
-      setTimeout(() => setStatus(null), 4000)
-    }
+      if (res.ok) { setStatus('success'); setForm({ name: '', email: '', subject: '', message: '' }); setTimeout(() => setStatus(null), 5000) }
+      else { setStatus('error'); setErrorMsg(data.error || 'Something went wrong.'); setTimeout(() => setStatus(null), 4000) }
+    } catch { setStatus('error'); setErrorMsg('Could not connect to server.'); setTimeout(() => setStatus(null), 4000) }
   }
 
-  const socialLinks = [
-    { icon: <BsLinkedin size={18} />, label: 'LinkedIn', href: profile.linkedin, value: profile.linkedin?.replace('https://', '') },
-    { icon: <BsGithub size={18} />, label: 'GitHub', href: profile.github, value: profile.github?.replace('https://', '') },
-    { icon: <MdEmail size={20} />, label: 'Email', href: `mailto:${profile.email}`, value: profile.email },
-    { icon: <FiMapPin size={18} />, label: 'Location', href: null, value: profile.location },
-  ]
+  // Only show social links that have values
+  const activeSocials = socialConfig.filter(s => profile[s.key])
 
   return (
     <section id="contact" style={{ minHeight: '100vh', padding: '100px 6vw', position: 'relative' }}>
@@ -106,28 +90,53 @@ export default function Contact() {
           <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#b47c7c', marginBottom: '32px' }}>
             Find me here
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {socialLinks.map((link, i) => (
-              <div
-                key={i}
-                onClick={() => link.href && window.open(link.href, '_blank')}
-                style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '18px 20px', border: `1px solid ${cardBorder}`, backgroundColor: cardBg, borderRadius: '4px', transition: 'all 0.3s ease', cursor: link.href ? 'pointer' : 'default' }}
-                onMouseEnter={e => { if (link.href) { e.currentTarget.style.borderColor = 'rgba(180,124,124,0.4)'; e.currentTarget.style.transform = 'translateX(4px)' } }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = cardBorder; e.currentTarget.style.transform = 'translateX(0)' }}
-              >
-                <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: 'rgba(180,124,124,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b47c7c', flexShrink: 0 }}>
-                  {link.icon}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {activeSocials.map((s, i) => {
+              const href = s.getHref ? s.getHref(profile[s.key]) : null
+              return (
+                <div
+                  key={s.key}
+                  onClick={() => href && window.open(href, '_blank')}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '16px',
+                    padding: '16px 20px', border: `1px solid ${cardBorder}`,
+                    backgroundColor: cardBg, borderRadius: '4px',
+                    transition: 'all 0.3s ease', cursor: href ? 'pointer' : 'default',
+                  }}
+                  onMouseEnter={e => {
+                    if (!href) return
+                    e.currentTarget.style.borderColor = s.color
+                    e.currentTarget.style.transform = 'translateX(4px)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = cardBorder
+                    e.currentTarget.style.transform = 'translateX(0)'
+                  }}
+                >
+                  <div style={{
+                    width: '38px', height: '38px', borderRadius: '50%',
+                    backgroundColor: `${s.color}18`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: s.color, flexShrink: 0,
+                  }}>
+                    {s.icon}
+                  </div>
+                  <div>
+                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: muted, marginBottom: '3px' }}>
+                      {s.label}
+                    </p>
+                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.84rem', fontWeight: 400, color: text }}>
+                      {s.key === 'whatsapp'
+                        ? profile[s.key]
+                        : s.key === 'email' || s.key === 'location'
+                          ? profile[s.key]
+                          : profile[s.key]?.replace('https://', '').replace('http://', '')}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: muted, marginBottom: '3px' }}>
-                    {link.label}
-                  </p>
-                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.84rem', fontWeight: 400, color: text }}>
-                    {link.value}
-                  </p>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -148,43 +157,27 @@ export default function Contact() {
                 <input type="email" name="email" value={form.email} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} placeholder="your@email.com" required style={inputStyle} />
               </div>
             </div>
-
             <div>
               <label style={{ fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: muted, display: 'block', marginBottom: '8px' }}>Subject</label>
               <input type="text" name="subject" value={form.subject} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} placeholder="What's this about?" style={inputStyle} />
             </div>
-
             <div>
               <label style={{ fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: muted, display: 'block', marginBottom: '8px' }}>Message *</label>
               <textarea name="message" value={form.message} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} placeholder="Tell me about your project or just say hello..." required rows={6} style={{ ...inputStyle, resize: 'vertical', minHeight: '140px' }} />
             </div>
-
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                padding: '14px 32px',
-                backgroundColor: status === 'success' ? '#6b9e7a' : '#b47c7c',
-                border: 'none', color: '#fff',
-                fontFamily: 'var(--font-sans)', fontSize: '0.72rem', fontWeight: 500,
-                letterSpacing: '0.18em', textTransform: 'uppercase',
-                cursor: status === 'loading' ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
-                opacity: status === 'loading' ? 0.7 : 1,
-                borderRadius: '2px', alignSelf: 'flex-start',
-              }}
-              onMouseEnter={e => { if (status !== 'loading') e.currentTarget.style.backgroundColor = status === 'success' ? '#5a8a69' : '#9d6868' }}
-              onMouseLeave={e => { if (status !== 'loading') e.currentTarget.style.backgroundColor = status === 'success' ? '#6b9e7a' : '#b47c7c' }}
-            >
-              {status === 'loading' ? 'Sending...'
-                : status === 'success' ? <><FiCheck size={14} /> Message Sent!</>
-                : <><FiSend size={14} /> Send Message</>}
+            <button type="submit" disabled={status === 'loading'} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+              padding: '14px 32px', backgroundColor: status === 'success' ? '#6b9e7a' : '#b47c7c',
+              border: 'none', color: '#fff', fontFamily: 'var(--font-sans)', fontSize: '0.72rem',
+              fontWeight: 500, letterSpacing: '0.18em', textTransform: 'uppercase',
+              cursor: status === 'loading' ? 'not-allowed' : 'pointer', transition: 'all 0.3s ease',
+              opacity: status === 'loading' ? 0.7 : 1, borderRadius: '2px', alignSelf: 'flex-start',
+            }}>
+              {status === 'loading' ? 'Sending...' : status === 'success' ? <><FiCheck size={14} /> Message Sent!</> : <><FiSend size={14} /> Send Message</>}
             </button>
-
             {status === 'error' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#c97b7b', fontFamily: 'var(--font-sans)', fontSize: '0.8rem' }}>
-                <FiAlertCircle size={14} /> {errorMsg || 'Something went wrong. Please try again.'}
+                <FiAlertCircle size={14} /> {errorMsg}
               </div>
             )}
           </form>
@@ -194,7 +187,18 @@ export default function Contact() {
       {/* Footer */}
       <div style={{ marginTop: '80px', paddingTop: '32px', borderTop: `1px solid ${cardBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <p style={{ fontFamily: 'var(--font-script)', fontSize: '1.6rem', color: '#b47c7c' }}>Ayeshi</p>
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.7rem', fontWeight: 300, color: muted, letterSpacing: '0.05em' }}>
+        <div style={{ display: 'flex', gap: '14px' }}>
+          {activeSocials.filter(s => s.getHref && s.key !== 'location').map(s => (
+            <a key={s.key} href={s.getHref(profile[s.key])} target="_blank" rel="noreferrer"
+              style={{ color: muted, transition: 'color 0.2s', display: 'flex', alignItems: 'center' }}
+              onMouseEnter={e => e.currentTarget.style.color = s.color}
+              onMouseLeave={e => e.currentTarget.style.color = muted}
+            >
+              {s.icon}
+            </a>
+          ))}
+        </div>
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.7rem', fontWeight: 300, color: muted }}>
           © {new Date().getFullYear()} Ayeshi I. Jayarathna. All rights reserved.
         </p>
       </div>
