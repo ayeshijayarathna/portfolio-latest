@@ -209,6 +209,22 @@ function ProfileTab({ isDark }) {
             <label style={s.formLabel}>GitHub URL</label>
             <input value={profile.github || ''} onChange={e => handleChange('github', e.target.value)} style={s.formInput} />
           </div>
+          <div>
+            <label style={s.formLabel}>Facebook URL</label>
+            <input value={profile.facebook || ''} onChange={e => handleChange('facebook', e.target.value)} style={s.formInput} placeholder="https://facebook.com/..." />
+          </div>
+          <div>
+            <label style={s.formLabel}>Instagram URL</label>
+            <input value={profile.instagram || ''} onChange={e => handleChange('instagram', e.target.value)} style={s.formInput} placeholder="https://instagram.com/..." />
+          </div>
+          <div>
+            <label style={s.formLabel}>WhatsApp Number</label>
+            <input value={profile.whatsapp || ''} onChange={e => handleChange('whatsapp', e.target.value)} style={s.formInput} placeholder="+94771234567" />
+          </div>
+          <div>
+            <label style={s.formLabel}>X / Twitter URL</label>
+            <input value={profile.twitter || ''} onChange={e => handleChange('twitter', e.target.value)} style={s.formInput} placeholder="https://x.com/..." />
+          </div>
           <div style={{ gridColumn: '1 / -1' }}>
             <label style={s.formLabel}>Email</label>
             <input value={profile.email || ''} onChange={e => handleChange('email', e.target.value)} style={s.formInput} />
