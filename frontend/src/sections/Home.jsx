@@ -47,7 +47,7 @@ export default function Home() {
 
   return (
     <section id="home" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', padding: '0 6vw', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0, background: isDark ? 'radial-gradient(ellipse at 70% 50%, rgba(180,124,124,0.08) 0%, transparent 60%)' : 'radial-gradient(ellipse at 70% 50%, rgba(212,164,154,0.18) 0%, transparent 60%)', pointerEvents: 'none' }} />
+
 
       {/* Left */}
       <div style={{ flex: 1, zIndex: 1, paddingTop: '80px', paddingBottom: '40px' }}>
