@@ -138,6 +138,7 @@ function ProfileTab({ isDark }) {
   const api = useApi('profile')
   const [profile, setProfile] = useState(null)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const s = getStyles(isDark)
 
   useEffect(() => { api.get().then(data => { if (data?._id) setProfile(data) }) }, [])
@@ -150,9 +151,16 @@ function ProfileTab({ isDark }) {
     setProfile(p => ({ ...p, stats }))
   }
   const handleSave = async () => {
-    await api.putSingle(profile)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2500)
+    setSaveError('')
+    try {
+      const res = await api.putSingle(profile)
+      if (res.error) { setSaveError(res.error); return }
+      setProfile(res)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    } catch (err) {
+      setSaveError('Save failed: ' + err.message)
+    }
   }
 
   if (!profile) return <p style={{ color: s.muted, fontFamily: 'var(--font-sans)' }}>Loading...</p>
@@ -161,9 +169,12 @@ function ProfileTab({ isDark }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <h2 style={s.sectionTitle}>Home & About</h2>
-        <button onClick={handleSave} style={s.saveBtn}>
-          {saved ? <><FiCheck size={13} /> Saved!</> : <><FiCheck size={13} /> Save Changes</>}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {saveError && <p style={{ color: '#c97b7b', fontFamily: 'var(--font-sans)', fontSize: '0.75rem' }}>{saveError}</p>}
+          <button onClick={handleSave} style={s.saveBtn}>
+            {saved ? <><FiCheck size={13} /> Saved!</> : <><FiCheck size={13} /> Save Changes</>}
+          </button>
+        </div>
       </div>
 
       {/* HOME SECTION */}
@@ -283,17 +294,30 @@ function ProjectsTab({ isDark }) {
   const [form, setForm] = useState({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '', image: '' })
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const s = getStyles(isDark)
 
   useEffect(() => { api.get().then(data => { if (Array.isArray(data)) setItems(data) }) }, [])
-  const resetForm = () => { setForm({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '', image: '' }); setEditing(null); setShowForm(false) }
+  const resetForm = () => { setForm({ title: '', description: '', tech: '', category: 'Fullstack', github: '', live: '', year: '', image: '' }); setEditing(null); setShowForm(false); setSaveError('') }
   const handleSave = async () => {
+    setSaveError('')
     const payload = { ...form, tech: form.tech.split(',').map(t => t.trim()).filter(Boolean) }
-    if (editing) { const u = await api.put(editing, payload); setItems(items.map(i => i._id === editing ? u : i)) }
-    else { const c = await api.post(payload); setItems([...items, c]) }
-    resetForm()
+    try {
+      if (editing) {
+        const u = await api.put(editing, payload)
+        if (u.error) { setSaveError(u.error); return }
+        setItems(items.map(i => i._id === editing ? u : i))
+      } else {
+        const c = await api.post(payload)
+        if (c.error) { setSaveError(c.error); return }
+        setItems([...items, c])
+      }
+      resetForm()
+    } catch (err) {
+      setSaveError('Save failed: ' + err.message)
+    }
   }
-  const handleEdit = item => { setForm({ ...item, tech: item.tech?.join(', ') || '' }); setEditing(item._id); setShowForm(true) }
+  const handleEdit = item => { setForm({ ...item, tech: item.tech?.join(', ') || '' }); setEditing(item._id); setShowForm(true); setSaveError('') }
   const handleDelete = async id => { if (!confirm('Delete?')) return; await api.del(id); setItems(items.filter(i => i._id !== id)) }
 
   return (
@@ -325,6 +349,7 @@ function ProjectsTab({ isDark }) {
               <textarea value={form.description || ''} onChange={e => setForm(f => ({...f,description:e.target.value}))} rows={3} style={{...s.formInput,resize:'vertical'}} />
             </div>
           </div>
+          {saveError && <p style={{ color: '#c97b7b', fontFamily: 'var(--font-sans)', fontSize: '0.75rem', marginBottom: '12px' }}>{saveError}</p>}
           <div style={{ display: 'flex', gap: '12px' }}>
             <button onClick={handleSave} style={s.saveBtn}><FiCheck size={13} /> {editing ? 'Update' : 'Save'}</button>
             <button onClick={resetForm} style={s.cancelBtn}><FiX size={13} /> Cancel</button>
@@ -398,23 +423,36 @@ function GenericTab({ endpoint, fields, title, isDark }) {
   const [form, setForm] = useState(() => fields.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {}))
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const s = getStyles(isDark)
 
   useEffect(() => { api.get().then(data => { if (Array.isArray(data)) setItems(data) }) }, [])
-  const resetForm = () => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {})); setEditing(null); setShowForm(false) }
+  const resetForm = () => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {})); setEditing(null); setShowForm(false); setSaveError('') }
   const handleSave = async () => {
-    if (editing) { const u = await api.put(editing, form); setItems(items.map(i => i._id === editing ? u : i)) }
-    else { const c = await api.post(form); setItems([...items, c]) }
-    resetForm()
+    setSaveError('')
+    try {
+      if (editing) {
+        const u = await api.put(editing, form)
+        if (u.error) { setSaveError(u.error); return }
+        setItems(items.map(i => i._id === editing ? u : i))
+      } else {
+        const c = await api.post(form)
+        if (c.error) { setSaveError(c.error); return }
+        setItems([...items, c])
+      }
+      resetForm()
+    } catch (err) {
+      setSaveError('Save failed: ' + err.message)
+    }
   }
-  const handleEdit = item => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: item[f.key] || '' }), {})); setEditing(item._id); setShowForm(true) }
+  const handleEdit = item => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: item[f.key] || '' }), {})); setEditing(item._id); setShowForm(true); setSaveError('') }
   const handleDelete = async id => { if (!confirm('Delete?')) return; await api.del(id); setItems(items.filter(i => i._id !== id)) }
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h2 style={s.sectionTitle}>{title} ({items.length})</h2>
-        <button onClick={() => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {})); setEditing(null); setShowForm(prev => !prev) }} style={s.addBtn}><FiPlus size={14} /> Add</button>
+        <button onClick={() => { setForm(fields.reduce((acc, f) => ({ ...acc, [f.key]: '' }), {})); setEditing(null); setShowForm(prev => !prev); setSaveError('') }} style={s.addBtn}><FiPlus size={14} /> Add</button>
       </div>
       {showForm && (
         <div style={s.formCard}>
@@ -441,6 +479,7 @@ function GenericTab({ endpoint, fields, title, isDark }) {
               </div>
             ))}
           </div>
+          {saveError && <p style={{ color: '#c97b7b', fontFamily: 'var(--font-sans)', fontSize: '0.75rem', marginBottom: '12px' }}>{saveError}</p>}
           <div style={{ display: 'flex', gap: '12px' }}>
             <button onClick={handleSave} style={s.saveBtn}><FiCheck size={13} /> {editing ? 'Update' : 'Save'}</button>
             <button onClick={resetForm} style={s.cancelBtn}><FiX size={13} /> Cancel</button>
