@@ -63,7 +63,7 @@ export default function Skills() {
   const tools = skills.filter(s => s.category === 'tool')
 
   return (
-    <section id="skills" ref={sectionRef} style={{ minHeight: '100vh', padding: '100px 6vw', position: 'relative' }}>
+    <section id="skills" ref={sectionRef} style={{ padding: '40px 6vw', position: 'relative' }}>
       <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882', marginBottom: '16px' }}>
         06 — Skills
       </p>

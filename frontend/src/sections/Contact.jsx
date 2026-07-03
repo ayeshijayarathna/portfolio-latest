@@ -74,7 +74,7 @@ export default function Contact() {
   const activeIcons = socialIcons.filter(s => profile[s.key])
 
   return (
-    <section id="contact" style={{ minHeight: '100vh', padding: '100px 6vw', position: 'relative' }}>
+    <section id="contact" style={{ padding: '40px 6vw', position: 'relative' }}>
 
       <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882', marginBottom: '16px' }}>
         07 — Contact

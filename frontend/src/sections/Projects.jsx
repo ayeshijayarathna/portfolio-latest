@@ -37,7 +37,7 @@ export default function Projects() {
   return (
     <section id="projects" style={{
       minHeight: '100vh',
-      padding: '100px 0',
+      padding: '40px 0',
       position: 'relative',
       overflow: 'hidden',
     }}>

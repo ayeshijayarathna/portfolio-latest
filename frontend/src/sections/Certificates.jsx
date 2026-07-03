@@ -25,7 +25,7 @@ export default function Certificates() {
   const baseUrl = 'http://localhost:5000'
 
   return (
-    <section id="certificates" style={{ padding: '100px 0', position: 'relative', overflow: 'hidden' }}>
+    <section id="certificates" style={{ padding: '40px 0', position: 'relative', overflow: 'hidden' }}>
       <p style={{ paddingLeft: '6vw', fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882', marginBottom: '16px' }}>
         03 — Certificates
       </p>
