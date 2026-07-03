@@ -9,15 +9,14 @@ const defaultProfile = {
   facebook: '', instagram: '', whatsapp: '', twitter: '',
 }
 
-const socialConfig = [
-  { key: 'linkedin',  icon: <BsLinkedin size={18} />,  label: 'LinkedIn',  color: '#0077b5', getHref: v => v },
-  { key: 'github',    icon: <BsGithub size={18} />,    label: 'GitHub',    color: '#6e5494', getHref: v => v },
-  { key: 'facebook',  icon: <BsFacebook size={18} />,  label: 'Facebook',  color: '#1877f2', getHref: v => v },
-  { key: 'instagram', icon: <BsInstagram size={18} />, label: 'Instagram', color: '#e1306c', getHref: v => v },
-  { key: 'whatsapp',  icon: <BsWhatsapp size={18} />,  label: 'WhatsApp',  color: '#25d366', getHref: v => `https://wa.me/${v.replace(/\D/g,'')}` },
-  { key: 'twitter',   icon: <BsTwitterX size={16} />,  label: 'X / Twitter', color: '#000000', getHref: v => v },
-  { key: 'email',     icon: <MdEmail size={20} />,     label: 'Email',     color: '#b47c7c', getHref: v => `mailto:${v}` },
-  { key: 'location',  icon: <FiMapPin size={18} />,    label: 'Location',  color: '#c9a882', getHref: null },
+const socialIcons = [
+  { key: 'linkedin',  icon: <BsLinkedin size={18} />,  getHref: v => v },
+  { key: 'github',    icon: <BsGithub size={18} />,    getHref: v => v },
+  { key: 'facebook',  icon: <BsFacebook size={18} />,  getHref: v => v },
+  { key: 'instagram', icon: <BsInstagram size={18} />, getHref: v => v },
+  { key: 'whatsapp',  icon: <BsWhatsapp size={18} />,  getHref: v => `https://wa.me/${v.replace(/\D/g,'')}` },
+  { key: 'twitter',   icon: <BsTwitterX size={16} />,  getHref: v => v },
+  { key: 'email',     icon: <MdEmail size={20} />,     getHref: v => `mailto:${v}` },
 ]
 
 export default function Contact() {
@@ -36,6 +35,7 @@ export default function Contact() {
   const cardBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.8)'
   const cardBorder = isDark ? 'rgba(232,224,213,0.1)' : 'rgba(44,44,44,0.1)'
   const inputBg = isDark ? 'rgba(255,255,255,0.04)' : '#ffffff'
+  const accent = '#b47c7c'
 
   const inputStyle = {
     width: '100%', padding: '13px 16px', backgroundColor: inputBg,
@@ -45,7 +45,7 @@ export default function Contact() {
   }
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
-  const handleFocus = e => e.target.style.borderColor = '#b47c7c'
+  const handleFocus = e => e.target.style.borderColor = accent
   const handleBlur = e => e.target.style.borderColor = cardBorder
 
   const handleSubmit = async e => {
@@ -58,13 +58,20 @@ export default function Contact() {
         body: JSON.stringify(form),
       })
       const data = await res.json()
-      if (res.ok) { setStatus('success'); setForm({ name: '', email: '', subject: '', message: '' }); setTimeout(() => setStatus(null), 5000) }
-      else { setStatus('error'); setErrorMsg(data.error || 'Something went wrong.'); setTimeout(() => setStatus(null), 4000) }
-    } catch { setStatus('error'); setErrorMsg('Could not connect to server.'); setTimeout(() => setStatus(null), 4000) }
+      if (res.ok) {
+        setStatus('success'); setForm({ name: '', email: '', subject: '', message: '' })
+        setTimeout(() => setStatus(null), 5000)
+      } else {
+        setStatus('error'); setErrorMsg(data.error || 'Something went wrong.')
+        setTimeout(() => setStatus(null), 4000)
+      }
+    } catch {
+      setStatus('error'); setErrorMsg('Could not connect to server.')
+      setTimeout(() => setStatus(null), 4000)
+    }
   }
 
-  // Only show social links that have values
-  const activeSocials = socialConfig.filter(s => profile[s.key])
+  const activeIcons = socialIcons.filter(s => profile[s.key])
 
   return (
     <section id="contact" style={{ minHeight: '100vh', padding: '100px 6vw', position: 'relative' }}>
@@ -75,7 +82,7 @@ export default function Contact() {
 
       <div style={{ marginBottom: '64px' }}>
         <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 3.5vw, 3rem)', fontWeight: 400, color: text, lineHeight: 1.2, marginBottom: '8px' }}>
-          Let's<span style={{ fontStyle: 'italic', color: '#b47c7c' }}> Connect</span>
+          Let's<span style={{ fontStyle: 'italic', color: accent }}> Connect</span>
         </h2>
         <div style={{ width: '40px', height: '1.5px', backgroundColor: '#c9a882' }} />
         <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.9rem', fontWeight: 300, color: muted, marginTop: '16px', maxWidth: '500px', lineHeight: 1.75 }}>
@@ -83,66 +90,99 @@ export default function Contact() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '64px', alignItems: 'start' }} className="contact-grid">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: '64px', alignItems: 'stretch' }} className="contact-grid">
 
-        {/* Social Links */}
-        <div>
-          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#b47c7c', marginBottom: '32px' }}>
+        {/* Left: Social Icons + Location + Image */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: accent, marginBottom: '28px' }}>
             Find me here
           </h3>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {activeSocials.map((s, i) => {
-              const href = s.getHref ? s.getHref(profile[s.key]) : null
-              return (
-                <div
-                  key={s.key}
-                  onClick={() => href && window.open(href, '_blank')}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '16px',
-                    padding: '16px 20px', border: `1px solid ${cardBorder}`,
-                    backgroundColor: cardBg, borderRadius: '4px',
-                    transition: 'all 0.3s ease', cursor: href ? 'pointer' : 'default',
-                  }}
-                  onMouseEnter={e => {
-                    if (!href) return
-                    e.currentTarget.style.borderColor = s.color
-                    e.currentTarget.style.transform = 'translateX(4px)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = cardBorder
-                    e.currentTarget.style.transform = 'translateX(0)'
-                  }}
-                >
-                  <div style={{
-                    width: '38px', height: '38px', borderRadius: '50%',
-                    backgroundColor: `${s.color}18`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: s.color, flexShrink: 0,
-                  }}>
-                    {s.icon}
-                  </div>
-                  <div>
-                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: muted, marginBottom: '3px' }}>
-                      {s.label}
-                    </p>
-                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.84rem', fontWeight: 400, color: text }}>
-                      {s.key === 'whatsapp'
-                        ? profile[s.key]
-                        : s.key === 'email' || s.key === 'location'
-                          ? profile[s.key]
-                          : profile[s.key]?.replace('https://', '').replace('http://', '')}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
+          {/* Social icon buttons row */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '40px' }}>
+            {activeIcons.map(s => (
+              <a
+                key={s.key}
+                href={s.getHref(profile[s.key])}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  width: '46px', height: '46px', borderRadius: '50%',
+                  border: `1px solid ${cardBorder}`,
+                  backgroundColor: cardBg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: muted, textDecoration: 'none',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = accent
+                  e.currentTarget.style.color = accent
+                  e.currentTarget.style.backgroundColor = isDark ? 'rgba(180,124,124,0.1)' : 'rgba(180,124,124,0.08)'
+                  e.currentTarget.style.transform = 'translateY(-3px)'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = cardBorder
+                  e.currentTarget.style.color = muted
+                  e.currentTarget.style.backgroundColor = cardBg
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
+                {s.icon}
+              </a>
+            ))}
+          </div>
+
+          {/* Location below icons */}
+          {profile.location && (
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: '14px',
+              padding: '20px', border: `1px solid ${cardBorder}`,
+              backgroundColor: cardBg, borderRadius: '4px',
+              marginBottom: '20px',
+            }}>
+              <div style={{
+                width: '38px', height: '38px', borderRadius: '50%',
+                backgroundColor: 'rgba(180,124,124,0.1)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: accent, flexShrink: 0,
+              }}>
+                <FiMapPin size={17} />
+              </div>
+              <div>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: muted, marginBottom: '4px' }}>
+                  Location
+                </p>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.88rem', fontWeight: 400, color: text }}>
+                  {profile.location}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Contact image */}
+          <div style={{
+            borderRadius: '4px',
+            overflow: 'hidden',
+            height: '500px',
+            border: `1px solid ${cardBorder}`,
+          }}>
+            <img
+              src="images/contact.png"
+              alt="Contact"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center',
+                display: 'block',
+              }}
+            />
           </div>
         </div>
 
         {/* Contact Form */}
         <div style={{ backgroundColor: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '4px', padding: '40px' }}>
-          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#b47c7c', marginBottom: '32px' }}>
+          <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: accent, marginBottom: '32px' }}>
             Send a message
           </h3>
 
@@ -163,18 +203,23 @@ export default function Contact() {
             </div>
             <div>
               <label style={{ fontFamily: 'var(--font-sans)', fontSize: '0.6rem', fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: muted, display: 'block', marginBottom: '8px' }}>Message *</label>
-              <textarea name="message" value={form.message} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} placeholder="Tell me about your project or just say hello..." required rows={6} style={{ ...inputStyle, resize: 'vertical', minHeight: '140px' }} />
+              <textarea name="message" value={form.message} onChange={handleChange} onFocus={handleFocus} onBlur={handleBlur} placeholder="Tell me about your project or just say hello..." required rows={6} style={{ ...inputStyle, resize: 'vertical', minHeight: '300px' }} />
             </div>
+
             <button type="submit" disabled={status === 'loading'} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-              padding: '14px 32px', backgroundColor: status === 'success' ? '#6b9e7a' : '#b47c7c',
+              padding: '14px 32px', backgroundColor: status === 'success' ? '#6b9e7a' : accent,
               border: 'none', color: '#fff', fontFamily: 'var(--font-sans)', fontSize: '0.72rem',
               fontWeight: 500, letterSpacing: '0.18em', textTransform: 'uppercase',
               cursor: status === 'loading' ? 'not-allowed' : 'pointer', transition: 'all 0.3s ease',
               opacity: status === 'loading' ? 0.7 : 1, borderRadius: '2px', alignSelf: 'flex-start',
-            }}>
+            }}
+            onMouseEnter={e => { if (status !== 'loading') e.currentTarget.style.backgroundColor = '#9d6868' }}
+            onMouseLeave={e => { if (status !== 'loading') e.currentTarget.style.backgroundColor = status === 'success' ? '#6b9e7a' : accent }}
+            >
               {status === 'loading' ? 'Sending...' : status === 'success' ? <><FiCheck size={14} /> Message Sent!</> : <><FiSend size={14} /> Send Message</>}
             </button>
+
             {status === 'error' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#c97b7b', fontFamily: 'var(--font-sans)', fontSize: '0.8rem' }}>
                 <FiAlertCircle size={14} /> {errorMsg}
@@ -186,12 +231,12 @@ export default function Contact() {
 
       {/* Footer */}
       <div style={{ marginTop: '80px', paddingTop: '32px', borderTop: `1px solid ${cardBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-        <p style={{ fontFamily: 'var(--font-script)', fontSize: '1.6rem', color: '#b47c7c' }}>Ayeshi</p>
+        <p style={{ fontFamily: 'var(--font-script)', fontSize: '1.6rem', color: accent }}>Ayeshi</p>
         <div style={{ display: 'flex', gap: '14px' }}>
-          {activeSocials.filter(s => s.getHref && s.key !== 'location').map(s => (
+          {activeIcons.map(s => (
             <a key={s.key} href={s.getHref(profile[s.key])} target="_blank" rel="noreferrer"
               style={{ color: muted, transition: 'color 0.2s', display: 'flex', alignItems: 'center' }}
-              onMouseEnter={e => e.currentTarget.style.color = s.color}
+              onMouseEnter={e => e.currentTarget.style.color = accent}
               onMouseLeave={e => e.currentTarget.style.color = muted}
             >
               {s.icon}
