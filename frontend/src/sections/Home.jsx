@@ -9,7 +9,7 @@ const defaultProfile = {
   name: 'Ayeshi I. Jayarathna',
   tagline: 'A fullstack engineer, UI designer, project manager and business analyst — blending quiet craft with considered strategy to build products that feel inevitable.',
   roles: ['Full Stack Engineer', 'UI/UX Designer', 'Business Analyst', 'Project Manager'],
-  estYear: '2022',
+  estYear: '2023',
   linkedin: 'https://linkedin.com',
   github: 'https://github.com',
   email: 'ayeshi@email.com',
@@ -64,10 +64,10 @@ export default function Home() {
         <ScrollReveal variant="fadeUp" delay={0.3}>
           <div style={{ marginBottom: '24px', lineHeight: 1.2 }}>
             <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 3rem)', fontWeight: 600, color: isDark ? '#e8e0d5' : '#2c2c2c', letterSpacing: '0.03em' }}>
-              DESIGNER · ENGINEER
+              DESIGNER · DEVELOPER
             </p>
             <p style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 3rem)', fontWeight: 400, fontStyle: 'italic', color: isDark ? 'rgba(232,224,213,0.35)' : 'rgba(44,44,44,0.28)', letterSpacing: '0.03em' }}>
-              Storyteller
+              Problem solver
             </p>
           </div>
         </ScrollReveal>
