@@ -66,28 +66,45 @@ app.use('/api/upload', uploadRoute)
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 
-// --- MongoDB connection, cached so we don't reconnect on every serverless call ---
-let isConnected = false
+// --- MongoDB connection, cached so concurrent serverless invocations share ---
+// one connection attempt instead of each racing to open its own.
+let connectionPromise = null
 
-async function connectDB() {
-  if (isConnected) return
+function connectDB() {
+  if (mongoose.connection.readyState === 1) {
+    return Promise.resolve()
+  }
   if (!process.env.MONGO_URI) {
     console.error('MONGO_URI environment variable is not set!')
-    return
+    return Promise.resolve()
   }
-  try {
-    await mongoose.connect(process.env.MONGO_URI)
-    isConnected = true
-    console.log('MongoDB connected')
-  } catch (err) {
-    console.error('MongoDB connection error:', err.message)
+  if (!connectionPromise) {
+    connectionPromise = mongoose
+      .connect(process.env.MONGO_URI, {
+        serverSelectionTimeoutMS: 8000,
+        maxPoolSize: 10,
+      })
+      .then(() => {
+        console.log('MongoDB connected')
+      })
+      .catch((err) => {
+        console.error('MongoDB connection error:', err.message)
+        // Allow the next request to retry instead of being stuck on a failed promise
+        connectionPromise = null
+        throw err
+      })
   }
+  return connectionPromise
 }
 
 // Make sure DB is connected before handling any request (needed on Vercel)
 app.use(async (req, res, next) => {
-  await connectDB()
-  next()
+  try {
+    await connectDB()
+    next()
+  } catch (err) {
+    res.status(503).json({ error: 'Database connection failed', details: err.message })
+  }
 })
 
 // Only start a real listening server when running locally.
