@@ -52,20 +52,6 @@ app.use(express.json())
 app.use('/images', express.static(path.join(__dirname, 'public/images')))
 app.use('/certificates', express.static(path.join(__dirname, 'public/certificates')))
 
-// Routes
-app.use('/api/auth', authRoute)
-app.use('/api/contact', contactRoute)
-app.use('/api/projects', projectRoute)
-app.use('/api/profile', profileRoute)
-app.use('/api/education', educationRoute)
-app.use('/api/experience', experienceRoute)
-app.use('/api/certificates', certificateRoute)
-app.use('/api/skills', skillRoute)
-app.use('/api/messages', messageRoute)
-app.use('/api/upload', uploadRoute)
-
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
-
 // --- MongoDB connection, cached so concurrent serverless invocations share ---
 // one connection attempt instead of each racing to open its own.
 let connectionPromise = null
@@ -97,7 +83,10 @@ function connectDB() {
   return connectionPromise
 }
 
-// Make sure DB is connected before handling any request (needed on Vercel)
+// IMPORTANT: this must come BEFORE the routes below, so every request
+// waits for a DB connection (or gets a clean 503) before hitting a
+// route handler. Registered after the routes, Express would match the
+// route first and this middleware would never run.
 app.use(async (req, res, next) => {
   try {
     await connectDB()
@@ -106,6 +95,20 @@ app.use(async (req, res, next) => {
     res.status(503).json({ error: 'Database connection failed', details: err.message })
   }
 })
+
+// Routes
+app.use('/api/auth', authRoute)
+app.use('/api/contact', contactRoute)
+app.use('/api/projects', projectRoute)
+app.use('/api/profile', profileRoute)
+app.use('/api/education', educationRoute)
+app.use('/api/experience', experienceRoute)
+app.use('/api/certificates', certificateRoute)
+app.use('/api/skills', skillRoute)
+app.use('/api/messages', messageRoute)
+app.use('/api/upload', uploadRoute)
+
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 
 // Only start a real listening server when running locally.
 // On Vercel, process.env.VERCEL is automatically set to "1",
