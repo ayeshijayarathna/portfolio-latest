@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { BsLinkedin, BsGithub, BsFacebook, BsInstagram, BsWhatsapp, BsTwitterX } from 'react-icons/bs'
 import { MdEmail } from 'react-icons/md'
 import { FiMapPin, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi'
+import { API_BASE_URL } from '../config'
 
 const defaultProfile = {
   linkedin: '', github: '', email: '', location: 'Kandy, Sri Lanka',
@@ -27,7 +28,7 @@ export default function Contact() {
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
-    fetch('/api/profile').then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
+    fetch(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
   }, [])
 
   const text = isDark ? '#e8e0d5' : '#2c2c2c'
@@ -53,7 +54,7 @@ export default function Contact() {
     if (!form.name || !form.email || !form.message) return
     setStatus('loading'); setErrorMsg('')
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
@@ -74,7 +75,7 @@ export default function Contact() {
   const activeIcons = socialIcons.filter(s => profile[s.key])
 
   return (
-    <section id="contact" style={{ padding: '40px 6vw', position: 'relative' }}>
+    <section id="contact" style={{ minHeight: '100vh', padding: '100px 6vw', position: 'relative' }}>
 
       <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882', marginBottom: '16px' }}>
         07 — Contact

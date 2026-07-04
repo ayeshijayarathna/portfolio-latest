@@ -1,5 +1,6 @@
 import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
+import { API_BASE_URL } from '../config'
 
 const typeBadgeColor = {
   'Full Time': '#b47c7c',
@@ -99,14 +100,14 @@ export default function Experience() {
   const text = isDark ? '#e8e0d5' : '#2c2c2c'
 
   useEffect(() => {
-    fetch('/api/experience')
+    fetch(`${API_BASE_URL}/api/experience`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data) && data.length > 0) setItems(data) })
       .catch(() => {})
   }, [])
 
   return (
-    <section id="experience" style={{ padding: '40px 4vw', position: 'relative' }}>
+    <section id="experience" style={{ minHeight: '100vh', padding: '100px 4vw', position: 'relative' }}>
       <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882', marginBottom: '16px', paddingLeft: '2vw' }}>
         05 — Experience
       </p>

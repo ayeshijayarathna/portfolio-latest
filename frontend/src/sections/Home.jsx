@@ -4,6 +4,7 @@ import { FiArrowRight } from 'react-icons/fi'
 import { BsLinkedin, BsGithub } from 'react-icons/bs'
 import { MdEmail } from 'react-icons/md'
 import ScrollReveal from '../components/ScrollReveal'
+import { API_BASE_URL } from '../config'
 
 const defaultProfile = {
   name: 'Ayeshi I. Jayarathna',
@@ -24,7 +25,7 @@ export default function Home() {
   const [typing, setTyping] = useState(true)
 
   useEffect(() => {
-    fetch('/api/profile').then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
+    fetch(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function Home() {
   }, [displayed, typing, currentRole, profile.roles])
 
   const scrollTo = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  const baseUrl = 'http://localhost:5000'
+  const baseUrl = API_BASE_URL
 
   return (
     <section id="home" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', padding: '0 6vw', position: 'relative', overflow: 'hidden' }}>

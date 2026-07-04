@@ -1,6 +1,7 @@
 import { useTheme } from '../context/ThemeContext'
 import { useRef, useState, useEffect } from 'react'
 import { FiExternalLink, FiAward, FiX } from 'react-icons/fi'
+import { API_BASE_URL } from '../config'
 
 const colors = ['#d4a49a', '#c9a882', '#b47c7c', '#9a9a9a', '#d4a49a', '#c9a882']
 
@@ -12,7 +13,7 @@ export default function Certificates() {
   const drag = useRef({ down: false, startX: 0, scrollLeft: 0 })
 
   useEffect(() => {
-    fetch('/api/certificates')
+    fetch(`${API_BASE_URL}/api/certificates`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setCertificates(data) })
       .catch(() => {})
@@ -22,10 +23,10 @@ export default function Certificates() {
   const muted = isDark ? 'rgba(232,224,213,0.55)' : 'rgba(44,44,44,0.55)'
   const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.9)'
   const cardBorder = isDark ? 'rgba(232,224,213,0.1)' : 'rgba(44,44,44,0.1)'
-  const baseUrl = 'http://localhost:5000'
+  const baseUrl = API_BASE_URL
 
   return (
-    <section id="certificates" style={{ padding: '40px 0', position: 'relative', overflow: 'hidden' }}>
+    <section id="certificates" style={{ padding: '100px 0', position: 'relative', overflow: 'hidden' }}>
       <p style={{ paddingLeft: '6vw', fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882', marginBottom: '16px' }}>
         03 — Certificates
       </p>

@@ -1,6 +1,7 @@
 import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
 import { FiMapPin } from 'react-icons/fi'
+import { API_BASE_URL } from '../config'
 
 function TimelineItem({ item, index, isDark, isLast }) {
   const ref = useRef(null)
@@ -117,14 +118,14 @@ export default function Education() {
   const text = isDark ? '#e8e0d5' : '#2c2c2c'
 
   useEffect(() => {
-    fetch('/api/education')
+    fetch(`${API_BASE_URL}/api/education`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data) && data.length > 0) setItems(data) })
       .catch(() => {})
   }, [])
 
   return (
-    <section id="education" style={{ padding: '40px 6vw', position: 'relative' }}>
+    <section id="education" style={{ minHeight: '100vh', padding: '100px 6vw', position: 'relative' }}>
       <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882', marginBottom: '16px' }}>
         02 — Education
       </p>

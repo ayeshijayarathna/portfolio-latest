@@ -2,6 +2,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
 import { FiCode, FiUsers, FiServer } from 'react-icons/fi'
 import { SiReact, SiNodedotjs, SiMongodb, SiExpress, SiTailwindcss, SiJavascript, SiTypescript, SiFigma, SiGit, SiPostman, SiCloudinary, SiVercel } from 'react-icons/si'
+import { API_BASE_URL } from '../config'
 
 const techIcons = {
   React: <SiReact size={26} />, 'Node.js': <SiNodedotjs size={26} />, MongoDB: <SiMongodb size={26} />,
@@ -38,7 +39,7 @@ export default function Skills() {
   const [skills, setSkills] = useState([])
 
   useEffect(() => {
-    fetch('/api/skills')
+    fetch(`${API_BASE_URL}/api/skills`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setSkills(data) })
       .catch(() => {})
@@ -63,7 +64,7 @@ export default function Skills() {
   const tools = skills.filter(s => s.category === 'tool')
 
   return (
-    <section id="skills" ref={sectionRef} style={{ padding: '40px 6vw', position: 'relative' }}>
+    <section id="skills" ref={sectionRef} style={{ minHeight: '100vh', padding: '100px 6vw', position: 'relative' }}>
       <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#c9a882', marginBottom: '16px' }}>
         06 — Skills
       </p>

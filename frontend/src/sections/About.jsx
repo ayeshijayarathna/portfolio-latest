@@ -2,6 +2,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
 import { FiCode, FiLayers, FiTrendingUp, FiUsers } from 'react-icons/fi'
 import ScrollReveal from '../components/ScrollReveal'
+import { API_BASE_URL } from '../config'
 
 const defaultProfile = {
   aboutHeading: 'Crafting digital experiences with purpose.',
@@ -44,7 +45,7 @@ export default function About() {
   const [profile, setProfile] = useState(defaultProfile)
 
   useEffect(() => {
-    fetch('/api/profile').then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
+    fetch(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export default function About() {
   const muted = isDark ? 'rgba(232,224,213,0.6)' : 'rgba(44,44,44,0.6)'
   const border = isDark ? 'rgba(232,224,213,0.08)' : 'rgba(44,44,44,0.08)'
   const cardBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(44,44,44,0.03)'
-  const baseUrl = 'http://localhost:5000'
+  const baseUrl = API_BASE_URL
 
   return (
     <section id="about" ref={sectionRef} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', padding: '100px 6vw', position: 'relative' }}>

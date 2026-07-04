@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { FiUpload, FiX, FiCheck } from 'react-icons/fi'
+import { API_BASE_URL } from '../config'
 
 // Reusable image upload component for admin dashboard
 export function ImageUpload({ onUpload, currentUrl, endpoint = 'image', label = 'Upload Image', accept = 'image/*' }) {
@@ -23,7 +24,7 @@ export function ImageUpload({ onUpload, currentUrl, endpoint = 'image', label = 
 
     try {
       const token = localStorage.getItem('adminToken')
-      const res = await fetch(`/api/upload/${endpoint}`, {
+      const res = await fetch(`${API_BASE_URL}/api/upload/${endpoint}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

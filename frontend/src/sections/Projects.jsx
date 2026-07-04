@@ -1,6 +1,7 @@
 import { useTheme } from '../context/ThemeContext'
 import { useState, useRef, useEffect } from 'react'
 import { FiGithub, FiExternalLink } from 'react-icons/fi'
+import { API_BASE_URL } from '../config'
 
 const allTechFilters = ['All', 'React', 'Node.js', 'MongoDB', 'Express', 'Tailwind', 'Figma']
 
@@ -12,7 +13,7 @@ export default function Projects() {
   const drag = useRef({ down: false, startX: 0, scrollLeft: 0 })
 
   useEffect(() => {
-    fetch('/api/projects')
+    fetch(`${API_BASE_URL}/api/projects`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data) && data.length > 0) setProjects(data) })
       .catch(() => {})
@@ -32,12 +33,12 @@ export default function Projects() {
   projects.forEach(p => p.tech?.forEach(t => techSet.add(t)))
   const techFilters = projects.length > 0 ? Array.from(techSet) : allTechFilters
 
-  const baseUrl = 'http://localhost:5000'
+  const baseUrl = API_BASE_URL
 
   return (
     <section id="projects" style={{
       minHeight: '100vh',
-      padding: '40px 0',
+      padding: '100px 0',
       position: 'relative',
       overflow: 'hidden',
     }}>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiLogOut, FiPlus, FiEdit2, FiTrash2, FiCheck, FiX, FiSun, FiMoon, FiUpload } from 'react-icons/fi'
 import { BsGrid, BsBook, BsBriefcase, BsAward, BsLightning, BsChatDots, BsPerson } from 'react-icons/bs'
+import { API_BASE_URL } from '../config'
 
 const tabs = [
   { id: 'profile', label: 'Home & About', icon: <BsPerson size={16} /> },
@@ -17,11 +18,11 @@ const token = () => localStorage.getItem('adminToken')
 const authHeaders = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` })
 
 function useApi(endpoint) {
-  const get = () => fetch(`/api/${endpoint}`, { headers: authHeaders() }).then(r => r.json())
-  const post = body => fetch(`/api/${endpoint}`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) }).then(r => r.json())
-  const put = (id, body) => fetch(`/api/${endpoint}/${id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(body) }).then(r => r.json())
-  const putSingle = body => fetch(`/api/${endpoint}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(body) }).then(r => r.json())
-  const del = id => fetch(`/api/${endpoint}/${id}`, { method: 'DELETE', headers: authHeaders() }).then(r => r.json())
+  const get = () => fetch(`${API_BASE_URL}/api/${endpoint}`, { headers: authHeaders() }).then(r => r.json())
+  const post = body => fetch(`${API_BASE_URL}/api/${endpoint}`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) }).then(r => r.json())
+  const put = (id, body) => fetch(`${API_BASE_URL}/api/${endpoint}/${id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(body) }).then(r => r.json())
+  const putSingle = body => fetch(`${API_BASE_URL}/api/${endpoint}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(body) }).then(r => r.json())
+  const del = id => fetch(`${API_BASE_URL}/api/${endpoint}/${id}`, { method: 'DELETE', headers: authHeaders() }).then(r => r.json())
   return { get, post, put, putSingle, del }
 }
 
@@ -72,7 +73,7 @@ function ImageUploadBox({ label, currentUrl, onUpload, isDark, endpoint = 'image
     formData.append(endpoint === 'certificate' ? 'file' : 'image', file)
 
     try {
-      const res = await fetch(`/api/upload/${endpoint}`, {
+      const res = await fetch(`${API_BASE_URL}/api/upload/${endpoint}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token()}` },
         body: formData,
@@ -84,7 +85,7 @@ function ImageUploadBox({ label, currentUrl, onUpload, isDark, endpoint = 'image
     finally { setUploading(false) }
   }
 
-  const baseUrl = 'http://localhost:5000'
+  const baseUrl = API_BASE_URL
   const displayUrl = preview?.startsWith('/') ? baseUrl + preview : preview
 
   return (
@@ -359,7 +360,7 @@ function ProjectsTab({ isDark }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {items.map(item => (
           <div key={item._id} style={s.itemCard}>
-            {item.image && <img src={item.image.startsWith('/') ? 'http://localhost:5000' + item.image : item.image} alt="" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '3px', flexShrink: 0 }} />}
+            {item.image && <img src={item.image.startsWith('/') ? API_BASE_URL + item.image : item.image} alt="" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '3px', flexShrink: 0 }} />}
             <div style={{ flex: 1 }}>
               <p style={s.itemTitle}>{item.title}</p>
               <p style={s.itemMeta}>{item.category} · {item.year} · {item.tech?.join(', ')}</p>
@@ -491,7 +492,7 @@ function GenericTab({ endpoint, fields, title, isDark }) {
           <div key={item._id} style={s.itemCard}>
             {item.image && (
               <img
-                src={item.image.startsWith('/') ? 'http://localhost:5000' + item.image : item.image}
+                src={item.image.startsWith('/') ? API_BASE_URL + item.image : item.image}
                 alt=""
                 style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '3px', flexShrink: 0 }}
                 onError={e => e.target.style.display = 'none'}
