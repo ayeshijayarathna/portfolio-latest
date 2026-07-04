@@ -1,4 +1,4 @@
-# Ayeshi I. Jayarathna — Portfolio
+# Portfolio
 
 A full-stack personal portfolio website with a public-facing site and a
 password-protected admin dashboard for managing content (profile, projects,
