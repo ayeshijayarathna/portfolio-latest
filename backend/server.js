@@ -29,7 +29,8 @@ app.use(cors({
 }))
 app.use(express.json())
 
-// Static files
+// Static files (Note: on Vercel serverless, uploaded files here won't persist —
+// image uploads already go through Cloudinary, so this is only for pre-existing assets)
 app.use('/images', express.static(path.join(__dirname, 'public/images')))
 app.use('/certificates', express.static(path.join(__dirname, 'public/certificates')))
 
@@ -47,11 +48,28 @@ app.use('/api/upload', uploadRoute)
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
+// --- MongoDB connection, cached across serverless invocations ---
+let isConnected = false
+
+export async function connectDB() {
+  if (isConnected) return
+  if (!process.env.MONGO_URI) {
+    console.error('MONGO_URI environment variable is not set!')
+    return
+  }
+  try {
+    await mongoose.connect(process.env.MONGO_URI)
+    isConnected = true
     console.log('MongoDB connected')
-    app.listen(process.env.PORT || 5000, () => {
-      console.log(`Server running on port ${process.env.PORT || 5000}`)
-    })
-  })
-  .catch(err => console.error('MongoDB error:', err))
+  } catch (err) {
+    console.error('MongoDB connection error:', err.message)
+  }
+}
+
+// Ensure DB is connected before handling any request (needed for serverless)
+app.use(async (req, res, next) => {
+  await connectDB()
+  next()
+})
+
+export default app
