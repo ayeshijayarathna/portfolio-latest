@@ -29,8 +29,7 @@ app.use(cors({
 }))
 app.use(express.json())
 
-// Static files (Note: on Vercel serverless, uploaded files here won't persist —
-// image uploads already go through Cloudinary, so this is only for pre-existing assets)
+// Static files
 app.use('/images', express.static(path.join(__dirname, 'public/images')))
 app.use('/certificates', express.static(path.join(__dirname, 'public/certificates')))
 
@@ -48,10 +47,10 @@ app.use('/api/upload', uploadRoute)
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 
-// --- MongoDB connection, cached across serverless invocations ---
+// --- MongoDB connection, cached so we don't reconnect on every serverless call ---
 let isConnected = false
 
-export async function connectDB() {
+async function connectDB() {
   if (isConnected) return
   if (!process.env.MONGO_URI) {
     console.error('MONGO_URI environment variable is not set!')
@@ -66,10 +65,22 @@ export async function connectDB() {
   }
 }
 
-// Ensure DB is connected before handling any request (needed for serverless)
+// Make sure DB is connected before handling any request (needed on Vercel)
 app.use(async (req, res, next) => {
   await connectDB()
   next()
 })
+
+// Only start a real listening server when running locally.
+// On Vercel, process.env.VERCEL is automatically set to "1",
+// and Vercel itself handles invoking the app per-request.
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`)
+    })
+  })
+}
 
 export default app
