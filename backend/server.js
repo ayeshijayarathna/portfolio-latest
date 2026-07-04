@@ -23,8 +23,27 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 
+const allowedOrigins = [
+  process.env.CLIENT_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+]
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. curl, server-to-server, mobile apps)
+    if (!origin) return callback(null, true)
+
+    // Allow explicit whitelisted origins
+    if (allowedOrigins.includes(origin)) return callback(null, true)
+
+    // Allow any Vercel preview/production deployment of this project
+    // e.g. https://portfolio-latest-3719-7p7ofdgqz-ashu2003.vercel.app
+    if (/^https:\/\/portfolio-latest-[a-z0-9-]*\.vercel\.app$/.test(origin)) {
+      return callback(null, true)
+    }
+
+    return callback(new Error(`Not allowed by CORS: ${origin}`))
+  },
   credentials: true,
 }))
 app.use(express.json())
