@@ -121,7 +121,7 @@ export default function Home() {
           est. {profile.estYear}
         </p>
         <img
-          src={profile.heroImage ? `${baseUrl}${profile.heroImage}` : '/avatar.jpg'}
+          src={profile.heroImage ? `${baseUrl}${profile.heroImage}` : '/avatar.png'}
           alt={profile.name}
           style={{ height: '88vh', width: 'auto', maxWidth: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block', filter: isDark ? 'brightness(0.85)' : 'none', position: 'relative', zIndex: 1 }}
         />

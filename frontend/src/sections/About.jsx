@@ -74,7 +74,7 @@ export default function About() {
         <ScrollReveal variant="fadeLeft" delay={0.2} style={{ flex: '0 0 auto', position: 'relative' }}>
           <div style={{ position: 'absolute', top: '16px', left: '16px', right: '-16px', bottom: '-16px', border: '1px solid rgba(180,124,124,0.3)', zIndex: 0 }} />
           <img
-            src={profile.aboutImage ? `${baseUrl}${profile.aboutImage}` : '/avatar.jpg'}
+            src={profile.aboutImage ? `${baseUrl}${profile.aboutImage}` : '/avatar.png'}
             alt="Ayeshi"
             style={{ width: '340px', height: '420px', objectFit: 'cover', objectPosition: 'top center', display: 'block', position: 'relative', zIndex: 1, filter: isDark ? 'brightness(0.88)' : 'none' }}
           />
