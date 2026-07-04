@@ -1,7 +1,7 @@
 import { useTheme } from '../context/ThemeContext'
 import { useRef, useState, useEffect } from 'react'
 import { FiExternalLink, FiAward, FiX } from 'react-icons/fi'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, fetchWithRetry } from '../config'
 
 const colors = ['#d4a49a', '#c9a882', '#b47c7c', '#9a9a9a', '#d4a49a', '#c9a882']
 
@@ -13,7 +13,7 @@ export default function Certificates() {
   const drag = useRef({ down: false, startX: 0, scrollLeft: 0 })
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/certificates`)
+    fetchWithRetry(`${API_BASE_URL}/api/certificates`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setCertificates(data) })
       .catch(() => {})

@@ -1,6 +1,6 @@
 import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, fetchWithRetry } from '../config'
 
 const typeBadgeColor = {
   'Full Time': '#b47c7c',
@@ -100,7 +100,7 @@ export default function Experience() {
   const text = isDark ? '#e8e0d5' : '#2c2c2c'
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/experience`)
+    fetchWithRetry(`${API_BASE_URL}/api/experience`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data) && data.length > 0) setItems(data) })
       .catch(() => {})

@@ -4,7 +4,7 @@ import { FiArrowRight } from 'react-icons/fi'
 import { BsLinkedin, BsGithub } from 'react-icons/bs'
 import { MdEmail } from 'react-icons/md'
 import ScrollReveal from '../components/ScrollReveal'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, fetchWithRetry } from '../config'
 
 const defaultProfile = {
   name: 'Ayeshi I. Jayarathna',
@@ -25,7 +25,7 @@ export default function Home() {
   const [typing, setTyping] = useState(true)
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
+    fetchWithRetry(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
   }, [])
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { useTheme } from '../context/ThemeContext'
 import { useState, useRef, useEffect } from 'react'
 import { FiGithub, FiExternalLink } from 'react-icons/fi'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, fetchWithRetry } from '../config'
 
 const allTechFilters = ['All', 'React', 'Node.js', 'MongoDB', 'Express', 'Tailwind', 'Figma']
 
@@ -13,7 +13,7 @@ export default function Projects() {
   const drag = useRef({ down: false, startX: 0, scrollLeft: 0 })
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/projects`)
+    fetchWithRetry(`${API_BASE_URL}/api/projects`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data) && data.length > 0) setProjects(data) })
       .catch(() => {})

@@ -2,7 +2,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
 import { FiCode, FiLayers, FiTrendingUp, FiUsers } from 'react-icons/fi'
 import ScrollReveal from '../components/ScrollReveal'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, fetchWithRetry } from '../config'
 
 const defaultProfile = {
   aboutHeading: 'Crafting digital experiences with purpose.',
@@ -45,7 +45,7 @@ export default function About() {
   const [profile, setProfile] = useState(defaultProfile)
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
+    fetchWithRetry(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
   }, [])
 
   useEffect(() => {

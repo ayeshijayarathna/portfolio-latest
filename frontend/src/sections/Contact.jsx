@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { BsLinkedin, BsGithub, BsFacebook, BsInstagram, BsWhatsapp, BsTwitterX } from 'react-icons/bs'
 import { MdEmail } from 'react-icons/md'
 import { FiMapPin, FiSend, FiCheck, FiAlertCircle } from 'react-icons/fi'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, fetchWithRetry } from '../config'
 
 const defaultProfile = {
   linkedin: '', github: '', email: '', location: 'Kandy, Sri Lanka',
@@ -28,7 +28,7 @@ export default function Contact() {
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
+    fetchWithRetry(`${API_BASE_URL}/api/profile`).then(r => r.json()).then(data => { if (data?._id) setProfile(data) }).catch(() => {})
   }, [])
 
   const text = isDark ? '#e8e0d5' : '#2c2c2c'

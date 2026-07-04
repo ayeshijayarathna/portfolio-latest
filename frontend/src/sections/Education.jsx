@@ -1,7 +1,7 @@
 import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
 import { FiMapPin } from 'react-icons/fi'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, fetchWithRetry } from '../config'
 
 function TimelineItem({ item, index, isDark, isLast }) {
   const ref = useRef(null)
@@ -118,7 +118,7 @@ export default function Education() {
   const text = isDark ? '#e8e0d5' : '#2c2c2c'
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/education`)
+    fetchWithRetry(`${API_BASE_URL}/api/education`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data) && data.length > 0) setItems(data) })
       .catch(() => {})

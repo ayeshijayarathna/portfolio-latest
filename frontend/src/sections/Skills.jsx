@@ -2,7 +2,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useEffect, useRef, useState } from 'react'
 import { FiCode, FiUsers, FiServer } from 'react-icons/fi'
 import { SiReact, SiNodedotjs, SiMongodb, SiExpress, SiTailwindcss, SiJavascript, SiTypescript, SiFigma, SiGit, SiPostman, SiCloudinary, SiVercel } from 'react-icons/si'
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, fetchWithRetry } from '../config'
 
 const techIcons = {
   React: <SiReact size={26} />, 'Node.js': <SiNodedotjs size={26} />, MongoDB: <SiMongodb size={26} />,
@@ -39,7 +39,7 @@ export default function Skills() {
   const [skills, setSkills] = useState([])
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/skills`)
+    fetchWithRetry(`${API_BASE_URL}/api/skills`)
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setSkills(data) })
       .catch(() => {})
